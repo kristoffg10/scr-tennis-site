@@ -1,0 +1,104 @@
+<template>
+    <div class="relative w-full p-[16px] bg-offwhite flex flex-col gap-[16px] overflow-y-auto mb-[32px]">
+        <Form v-if="faqData" id="form" @submit="submit()" class="w-full gap-[16px] flex flex-col">
+            <div class="bg-white p-[16px] flex flex-col gap-[16px] rounded-[10px] w-full">
+                <h2 class="font-semibold text-xl text-start w-full">FAQ Information</h2>
+                <div class="grid grid-cols-1 gap-[16px]">
+                    <TextField label="Title" name="title" v-model="formData.title" placeholder="e.g. What is this?" :rules="'required|max:255'"
+                        optionalMessage="Max 255 characters" />
+                </div>
+                <div class="grid grid-cols-1 gap-[16px]">
+                    <Quill v-if="isClient" v-model="formData.answer" :modelValue="formData.answer" :name="`answer`" :label="`Answer`" 
+                        :max="0" :placeholder="`Enter answer`"/>
+                </div>
+                <!-- <div class="grid grid-cols-1 gap-[16px]">
+                    <TextField label="Sequence" name="sequence" v-model="formData.sequence" type="number" placeholder="e.g. 1" :rules="'required|numeric'"
+                        optionalMessage="Display order" />
+                </div> -->
+            </div>
+
+            <div class="flex self-end gap-[16px]">
+                <button type="submit" class="px-[24px] py-[12px] bg-ui-color text-white text-center rounded-[10px]">Save
+                    Changes</button>
+            </div>
+        </Form>
+    </div>
+</template>
+
+<script setup>
+import { usePageTitleStore } from '~/stores/pageTitle';
+import { Form } from 'vee-validate';
+import { useRoute } from 'vue-router';
+
+definePageMeta({
+    middleware: 'authenticator'
+})
+
+const Quill = defineAsyncComponent(() => {
+    return import('@/components/form-fields/Quill.vue')
+})
+
+const nuxtApp = useNuxtApp();
+const isClient = ref(false);
+const route = useRoute();
+const pageTitle = usePageTitleStore();
+const id = route.params.id;
+const parentId = route.params.parent_id;
+
+const formData = reactive({
+    title: '',
+    answer: '',
+    sequence: 1
+})
+
+const faqData = ref(null);
+
+onMounted(() => {
+    isClient.value = true;
+    pageTitle.setTitle(`Edit FAQ`);
+    pageTitle.setBreadcrumbs(['Section FAQs', 'Edit FAQ']);
+    pageTitle.setPageFrom('Section FAQs');
+    pageTitle.setPageFromRoute(`/section-faqs/${parentId}`);
+    fetchRecords();
+});
+
+const fetchRecords = async () => {
+    try {
+        const faq_response = await nuxtApp.$axios.get(`/cms/section-faq/${parentId}/${id}`);
+        faqData.value = faq_response.data.record;
+        populateData(faqData.value);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+const submit = async () => {
+    const formElement = document.getElementById('form');
+    const form_data = new FormData(formElement);
+    form_data.set('answer', formData.answer || '');
+    form_data.set('sequence', formData.sequence);
+    form_data.append('_method', 'PATCH');
+
+    try {
+        await nuxtApp.$axios.post(`/cms/section-faq/${parentId}/${id}`, form_data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }).then((response) => {
+            const record = response.data.record;
+            populateData(record);
+            nuxtApp.$toast.success('FAQ updated successfully!');
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        nuxtApp.$toast.error('Error updating FAQ. Please try again.');
+    }
+}
+
+const populateData = (data) => {
+    formData.title = data.title || '';
+    formData.answer = data.answer || '';
+    const seq = Number(data.sequence);
+    formData.sequence = Number.isInteger(seq) && seq > 0 ? seq : 1;
+}
+</script>
