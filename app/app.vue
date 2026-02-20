@@ -1,10 +1,16 @@
 <template>
-    <NuxtLayout>
-        <NuxtPage />
-    </NuxtLayout>
+    <div>
+        <LoadingScreen :is-loading="isNavigating" />
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
+    </div>
 </template>
 <script setup>
-    const { $nonce } = useNuxtApp(); // Access the nonce from the plugin
+    const { $nonce, $isNavigating } = useNuxtApp();
+    const isNavigating = $isNavigating;
+
+    // Access the nonce from the plugin
     useHead({
         link: [
             { rel: 'icon', type: 'image/x-icon', href: '/inlife-favicon.ico' },

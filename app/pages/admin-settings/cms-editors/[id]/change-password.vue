@@ -1,166 +1,212 @@
 <template>
-    <div class="relative w-full p-[16px] bg-offwhite flex flex-col gap-[16px] overflow-y-auto mb-[32px]">
-        <Form id="form" @submit="submit()" class="w-full gap-[16px] flex flex-col">
-            <div class="bg-white p-[16px] flex flex-col gap-[16px] rounded-[10px] w-full">
-                <h2 class="font-semibold text-xl text-start w-full">Password Information</h2>
-                <div class="grid grid-cols-2 gap-[16px]">
-                    <div class="flex flex-col w-full gap-y-[8px] relative">
-                        <label for="password" class="text-base font-[500]  text-black/70">New Password</label>
-                        <Field 
-                            name="password" 
-                            :type="passwordFieldType.password.type" 
-                            v-model="password" 
-                            placeholder="Enter your password"
-                            rules="required|min:6|password"
-                            class="border border-black/20 border-[1px] rounded-[10px] p-[16px] outline-none focus:border-ui-color" 
-                        />
-                        <ErrorMessage name="password" class="text-red-500 mt-1 text-sm" />
-                        
-                        <!-- Password Toggle SVG -->
-                        <span @click="togglePasswordVisibility('password')" class="absolute top-1/2 transform translate-y-1/2 right-[16px] flex items-center cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="19" viewBox="0 0 27 19" fill="none">
-                            <path d="M0.229542 9.13756C0.268696 9.04918 1.21619 6.94724 3.32261 4.84081C6.12931 2.03411 9.67432 0.550781 13.5762 0.550781C17.478 0.550781 21.0231 2.03411 23.8298 4.84081C25.9362 6.94724 26.8881 9.05254 26.9228 9.13756C26.9737 9.25201 27 9.37587 27 9.50112C27 9.62637 26.9737 9.75023 26.9228 9.86468C26.8837 9.95305 25.9362 12.0539 23.8298 14.1603C21.0231 16.9659 17.478 18.4492 13.5762 18.4492C9.67432 18.4492 6.12931 16.9659 3.32261 14.1603C1.21619 12.0539 0.268696 9.95305 0.229542 9.86468C0.178658 9.75023 0.152365 9.62637 0.152365 9.50112C0.152365 9.37587 0.178658 9.25201 0.229542 9.13756ZM13.5762 16.6594C17.0194 16.6594 20.0275 15.4076 22.5176 12.9399C23.5393 11.9238 24.4086 10.7651 25.0983 9.5C24.4087 8.23474 23.5395 7.07608 22.5176 6.06014C20.0275 3.5924 17.0194 2.34063 13.5762 2.34063C10.133 2.34063 7.12492 3.5924 4.6348 6.06014C3.61108 7.07583 2.73992 8.23449 2.04847 9.5C2.85502 11.0057 6.36871 16.6594 13.5762 16.6594ZM13.5762 4.13047C14.6382 4.13047 15.6763 4.44539 16.5593 5.0354C17.4423 5.62541 18.1306 6.46402 18.537 7.44517C18.9434 8.42632 19.0497 9.50596 18.8425 10.5475C18.6354 11.5891 18.124 12.5459 17.373 13.2968C16.6221 14.0478 15.6653 14.5592 14.6237 14.7664C13.5821 14.9735 12.5025 14.8672 11.5214 14.4608C10.5402 14.0544 9.70159 13.3662 9.11158 12.4832C8.52157 11.6001 8.20665 10.562 8.20665 9.5C8.20813 8.07637 8.77432 6.71147 9.78098 5.7048C10.7876 4.69814 12.1525 4.13195 13.5762 4.13047ZM13.5762 13.0797C14.2842 13.0797 14.9763 12.8697 15.5649 12.4764C16.1536 12.0831 16.6124 11.524 16.8834 10.8699C17.1543 10.2158 17.2252 9.49603 17.0871 8.80164C16.949 8.10725 16.608 7.46941 16.1074 6.96878C15.6068 6.46815 14.9689 6.12722 14.2745 5.9891C13.5802 5.85097 12.8604 5.92186 12.2063 6.1928C11.5522 6.46374 10.9931 6.92256 10.5998 7.51123C10.2064 8.09991 9.9965 8.792 9.9965 9.5C9.9965 10.4494 10.3736 11.3599 11.045 12.0312C11.7163 12.7025 12.6268 13.0797 13.5762 13.0797Z" fill="black"/>
-                        </svg>
-                        </span>
-                        <!-- <div class="grid grid-cols-4 items-center gap-x-[8px]">
-                            <div v-for="i in 4" :key="i" class="h-[4px] w-auto" :class="strengthBg[i]"></div>
-                        </div> -->
-                    </div>
-                    <div class="flex flex-col w-full gap-y-[8px] relative">
-                        <label for="password" class="text-base font-[500]  text-black/70">Confirm Password</label>
-                        <Field 
-                            name="password_confirmation" 
-                            :type="passwordFieldType.password_confirmation.type" 
-                            v-model="password_confirmation" 
-                            placeholder="Enter your password"
-                            :rules="`required|min:6|password|confirmed:${password}`"
-                            class="border border-black/20 border-[1px] rounded-[10px] p-[16px] outline-none focus:border-ui-color" 
-                        />
-                        <ErrorMessage name="password_confirmation" class="text-red-500 mt-1 text-sm" />
-                        
-                        <!-- Password Toggle SVG -->
-                        <span @click="togglePasswordVisibility('password_confirmation')" class="absolute top-1/2 transform translate-y-1/2 right-[16px] flex items-center cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="19" viewBox="0 0 27 19" fill="none">
-                            <path d="M0.229542 9.13756C0.268696 9.04918 1.21619 6.94724 3.32261 4.84081C6.12931 2.03411 9.67432 0.550781 13.5762 0.550781C17.478 0.550781 21.0231 2.03411 23.8298 4.84081C25.9362 6.94724 26.8881 9.05254 26.9228 9.13756C26.9737 9.25201 27 9.37587 27 9.50112C27 9.62637 26.9737 9.75023 26.9228 9.86468C26.8837 9.95305 25.9362 12.0539 23.8298 14.1603C21.0231 16.9659 17.478 18.4492 13.5762 18.4492C9.67432 18.4492 6.12931 16.9659 3.32261 14.1603C1.21619 12.0539 0.268696 9.95305 0.229542 9.86468C0.178658 9.75023 0.152365 9.62637 0.152365 9.50112C0.152365 9.37587 0.178658 9.25201 0.229542 9.13756ZM13.5762 16.6594C17.0194 16.6594 20.0275 15.4076 22.5176 12.9399C23.5393 11.9238 24.4086 10.7651 25.0983 9.5C24.4087 8.23474 23.5395 7.07608 22.5176 6.06014C20.0275 3.5924 17.0194 2.34063 13.5762 2.34063C10.133 2.34063 7.12492 3.5924 4.6348 6.06014C3.61108 7.07583 2.73992 8.23449 2.04847 9.5C2.85502 11.0057 6.36871 16.6594 13.5762 16.6594ZM13.5762 4.13047C14.6382 4.13047 15.6763 4.44539 16.5593 5.0354C17.4423 5.62541 18.1306 6.46402 18.537 7.44517C18.9434 8.42632 19.0497 9.50596 18.8425 10.5475C18.6354 11.5891 18.124 12.5459 17.373 13.2968C16.6221 14.0478 15.6653 14.5592 14.6237 14.7664C13.5821 14.9735 12.5025 14.8672 11.5214 14.4608C10.5402 14.0544 9.70159 13.3662 9.11158 12.4832C8.52157 11.6001 8.20665 10.562 8.20665 9.5C8.20813 8.07637 8.77432 6.71147 9.78098 5.7048C10.7876 4.69814 12.1525 4.13195 13.5762 4.13047ZM13.5762 13.0797C14.2842 13.0797 14.9763 12.8697 15.5649 12.4764C16.1536 12.0831 16.6124 11.524 16.8834 10.8699C17.1543 10.2158 17.2252 9.49603 17.0871 8.80164C16.949 8.10725 16.608 7.46941 16.1074 6.96878C15.6068 6.46815 14.9689 6.12722 14.2745 5.9891C13.5802 5.85097 12.8604 5.92186 12.2063 6.1928C11.5522 6.46374 10.9931 6.92256 10.5998 7.51123C10.2064 8.09991 9.9965 8.792 9.9965 9.5C9.9965 10.4494 10.3736 11.3599 11.045 12.0312C11.7163 12.7025 12.6268 13.0797 13.5762 13.0797Z" fill="black"/>
-                        </svg>
-                        </span>
-                    </div>
-                </div>
+    <div
+      class="min-h-screen w-full relative bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] overflow-y-auto overflow-x-hidden pt-[220px] pb-16"
+    >
+      <!-- Texture overlay -->
+      <div
+        class="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"
+        aria-hidden="true"
+      />
+      <!-- Gold glow top right -->
+      <div class="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9A227]/10 rounded-full blur-3xl" aria-hidden="true" />
+      <!-- Gold glow bottom left -->
+      <div class="pointer-events-none absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C9A227]/5 rounded-full blur-3xl" aria-hidden="true" />
+  
+      <div class="relative z-10 max-w-3xl mx-auto px-4 lg:px-8 flex flex-col gap-8">
+  
+        <!-- ── Header ── -->
+        <header class="flex flex-col gap-1">
+          <p class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]/70">Admin Settings · Users</p>
+          <h1 class="text-3xl md:text-4xl font-semibold text-white leading-tight">
+            Change <span class="text-[#D4AF37]">Password</span>
+          </h1>
+          <p class="text-sm text-white/50 mt-1">Set a new secure password for this account.</p>
+        </header>
+  
+        <!-- ── Form ── -->
+        <Form id="form" @submit="submit()" class="flex flex-col gap-6">
+  
+          <!-- Password Card -->
+          <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
+            <!-- Gold top stripe -->
+            <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
+  
+            <!-- Card header -->
+            <div class="px-6 py-5 border-b border-white/10 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-base font-semibold text-white">Password Information</h2>
+                <p class="text-xs text-white/40">Must be at least 6 characters long</p>
+              </div>
             </div>
-            <!-- <div class="p-[16px] bg-[#EAF5FF] flex flex-col gap-[8px] w-1/2">
-                <div class="flex gap-[8px] text-ui-color text-base">
-                    <span class="w-[20px] h-[20px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.3333 10C18.3333 14.6023 14.6023 18.3333 10 18.3333C5.39762 18.3333 1.66667 14.6023 1.66667 10C1.66667 5.39762 5.39762 1.66667 10 1.66667C14.6023 1.66667 18.3333 5.39762 18.3333 10ZM20 10C20 15.5229 15.5229 20 10 20C4.47716 20 0 15.5229 0 10C0 4.47716 4.47716 0 10 0C15.5229 0 20 4.47716 20 10ZM9.16667 11.6667V5.83333H10.8333V11.6667H9.16667ZM9.16667 14.1667V12.5H10.8333V14.1667H9.16667Z" fill="#283894"/>
-                        </svg>
-                    </span>
-                    <span class="font-medium">NOTE</span>
+  
+            <!-- Fields -->
+            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+  
+              <!-- New Password -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">
+                  New Password <span class="text-[#D4AF37]">*</span>
+                </label>
+                <div class="relative">
+                  <Field
+                    name="password"
+                    :type="passwordFieldType.password.type"
+                    v-model="password"
+                    placeholder="Enter new password"
+                    rules="required|min:6|password"
+                    class="w-full pr-11 pl-4 py-3 rounded-xl bg-white/5 border border-[#C9A227]/20 text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#C9A227]/60 focus:bg-white/10 transition-all"
+                  />
+                  <!-- Toggle visibility -->
+                  <button
+                    type="button"
+                    @click="togglePasswordVisibility('password')"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-[#D4AF37] transition-colors"
+                  >
+                    <!-- Eye icon (show) -->
+                    <svg v-if="passwordFieldType.password.type === 'password'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                    </svg>
+                    <!-- Eye-slash icon (hide) -->
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                    </svg>
+                  </button>
                 </div>
-                <p class="text-sm text-black font-normal">A system generated email will be sent to your newly added users. <br> This will contain a pre-generated password for them to use on their initial sign in.</p>
-            </div> -->
-            <div class="flex self-end gap-[16px]">
-                <button type="submit" class="px-[24px] py-[12px] bg-ui-color text-white text-center rounded-[10px]">Change Password</button>
+                <ErrorMessage name="password" class="text-red-400 text-xs mt-0.5" />
+              </div>
+  
+              <!-- Confirm Password -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">
+                  Confirm Password <span class="text-[#D4AF37]">*</span>
+                </label>
+                <div class="relative">
+                  <Field
+                    name="password_confirmation"
+                    :type="passwordFieldType.password_confirmation.type"
+                    v-model="password_confirmation"
+                    placeholder="Confirm new password"
+                    :rules="`required|min:6|password|confirmed:${password}`"
+                    class="w-full pr-11 pl-4 py-3 rounded-xl bg-white/5 border border-[#C9A227]/20 text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#C9A227]/60 focus:bg-white/10 transition-all"
+                  />
+                  <!-- Toggle visibility -->
+                  <button
+                    type="button"
+                    @click="togglePasswordVisibility('password_confirmation')"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-[#D4AF37] transition-colors"
+                  >
+                    <svg v-if="passwordFieldType.password_confirmation.type === 'password'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                    </svg>
+                  </button>
+                </div>
+                <ErrorMessage name="password_confirmation" class="text-red-400 text-xs mt-0.5" />
+              </div>
+  
             </div>
+  
+            <!-- Password hint bar -->
+            <div class="px-6 pb-6">
+              <div class="rounded-xl bg-white/3 border border-white/8 px-4 py-3 flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="text-[#D4AF37]">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                  </svg>
+                </div>
+                <p class="text-xs text-white/40 leading-relaxed">
+                  Password must be at least <span class="text-white/60 font-medium">6 characters</span>. Both fields must match before saving.
+                </p>
+              </div>
+            </div>
+          </div>
+  
+          <!-- ── Action Buttons ── -->
+          <div class="flex items-center justify-end gap-3">
+            <router-link
+              :to="`/admin-settings/cms-editors/${route.params.id}/update`"
+              class="px-5 py-2.5 rounded-xl border border-white/15 text-white/60 text-sm font-medium hover:border-white/30 hover:text-white/80 transition-all"
+            >
+              Cancel
+            </router-link>
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+              </svg>
+              Change Password
+            </button>
+          </div>
+  
         </Form>
+      </div>
     </div>
-    </template>
-    
-    <script setup>
-    import { usePageTitleStore } from '~/stores/pageTitle';
-    import { Form, Field, ErrorMessage } from 'vee-validate';
-    import { useRoute } from 'vue-router';
-    import { useAsyncData } from 'nuxt/app'
-    
-    definePageMeta({
-        middleware: 'authenticator'
-    })
-
-    const ImageHandler = defineAsyncComponent(() => {
-        return import('@/components/form-fields/ImageHandler.vue')
-    })
-    
-    
-    const nuxtApp = useNuxtApp();
-    const router = useRouter();
-    const route = useRoute();
-    const pageTitle = usePageTitleStore();
-    
-    
-    const password = ref('');
-    const password_confirmation = ref('');
-
-    
-    const passwordFieldType = ref({
-        password: {
-            type: 'password'
-        },
-        password_confirmation: {
-            type: 'password'
-        }
-    }); // Track the password field type
-
-    const togglePasswordVisibility = (field) => {
-        passwordFieldType.value[field].type =
-        passwordFieldType.value[field].type === 'password' ? 'text' : 'password';
-    };
-
-    // const strengthBg = computed(() => {
-    //     if (password.value) {
-    //         const strength = zxcvbn(password.value).score;
-    //         const colors = ['bg-ui-color/10', 'bg-ui-color/30', 'bg-ui-color/50', 'bg-ui-color/70', 'bg-ui-color/90'];
-    //         return colors[strength];
-    //     } else {
-    //         const colors = ['bg-gray', 'bg-gray', 'bg-gray', 'bg-gray', 'bg-gray'];
-    //         return colors;
-    //     }
-    // })
-    // const strengthBg = (value) => {
-    //     switch (value) {
-    //         case value.length >= 6:
-    //             return  ['bg-ui-color', 'bg-ui-color/70', 'bg-ui-color/50', 'bg-ui-color/30'];
-    //         case value.length >= 6 && value.match(/\d+$/):
-    //             return  ['bg-ui-color', 'bg-ui-color/70', 'bg-ui-color/50', 'bg-ui-color/30'];
-    //     }
-    // }
-    
-    onMounted(() => {
-    
-    
-        pageTitle.setTitle(`Change Password`);
-        pageTitle.setBreadcrumbs(['Admin Settings', 'Users', 'Edit User', 'Change Password']);
-    
-        pageTitle.setPageFrom('Edit User');
-        pageTitle.setPageFromRoute(`/admin-settings/cms-editors/${route.params.id}/update` );
-        // fetchRecords();
-        // populateData(sectionData.value);
-    });
-    const submit = async (isEnabled = 1) => {
-            const formElement = document.getElementById('form');
-            const form_data = new FormData(formElement);
-    
-            form_data.append('password', password.value)
-            form_data.append('password_confirmation', password_confirmation.value)
-            form_data.append('update_password', 1)
-            form_data.append('_method', 'PATCH');
-            // form_data.append('password_confirmation', default_password)
-            try {
-                const response = await nuxtApp.$axios.post(`/cms/users/${route.params.id}`, form_data , {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }).then(() => {
-                    nuxtApp.$toast.success('Password changed successfully!');
-                    setTimeout(() => {
-                        router.push(`/admin-settings/cms-editors/${route.params.id}/update`);
-                    }, 2500);
-                }); 
-    
-            } catch (error) {
-                console.error('Error:', error);
-                nuxtApp.$toast.error(error.response.data.errors[0])
-            }
-        }
-    
-
-    
-    </script>
+  </template>
+  
+  <script setup>
+  import { ref, onMounted } from 'vue';
+  import { usePageTitleStore } from '~/stores/pageTitle';
+  import { Form, Field, ErrorMessage } from 'vee-validate';
+  import { useRoute } from 'vue-router';
+  
+  definePageMeta({ middleware: 'authenticator' });
+  
+  const nuxtApp = useNuxtApp();
+  const router = useRouter();
+  const route = useRoute();
+  const pageTitle = usePageTitleStore();
+  
+  const password = ref('');
+  const password_confirmation = ref('');
+  
+  const passwordFieldType = ref({
+    password: { type: 'password' },
+    password_confirmation: { type: 'password' },
+  });
+  
+  const togglePasswordVisibility = (field) => {
+    passwordFieldType.value[field].type =
+      passwordFieldType.value[field].type === 'password' ? 'text' : 'password';
+  };
+  
+  onMounted(() => {
+    pageTitle.setTitle('Change Password');
+    pageTitle.setBreadcrumbs(['Admin Settings', 'Users', 'Edit User', 'Change Password']);
+    pageTitle.setPageFrom('Edit User');
+    pageTitle.setPageFromRoute(`/admin-settings/cms-editors/${route.params.id}/update`);
+  });
+  
+  const submit = async () => {
+    const formElement = document.getElementById('form');
+    const form_data = new FormData(formElement);
+    form_data.append('password', password.value);
+    form_data.append('password_confirmation', password_confirmation.value);
+    form_data.append('update_password', 1);
+    form_data.append('_method', 'PATCH');
+  
+    try {
+      await nuxtApp.$axios.post(`/cms/users/${route.params.id}`, form_data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      nuxtApp.$toast.success('Password changed successfully!');
+      setTimeout(() => {
+        router.push(`/admin-settings/cms-editors/${route.params.id}/update`);
+      }, 2500);
+    } catch (error) {
+      console.error('Error:', error);
+      nuxtApp.$toast.error(error?.response?.data?.errors?.[0] || 'Error changing password.');
+    }
+  };
+  </script>

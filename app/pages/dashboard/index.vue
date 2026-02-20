@@ -49,21 +49,22 @@
           </div>
         </div>
 
-        <!-- Swiper card slider -->
-        <Swiper
-          :modules="swiperModules"
-          :slides-per-view="'auto'"
-          :space-between="16"
-          :loop="true"
-          :centered-slides="false"
-          class="quick-actions-swiper !pb-3"
-          @swiper="onSwiper"
-          @slide-change="onSlideChange"
-          :navigation="{
-            prevEl: '.quick-actions-prev',
-            nextEl: '.quick-actions-next',
-          }"
-        >
+        <!-- Swiper card slider: mask fades tile edges when partially visible -->
+        <div class="quick-actions-mask -mx-4 px-4 md:-mx-8 md:px-8 overflow-hidden">
+          <Swiper
+            :modules="swiperModules"
+            :slides-per-view="'auto'"
+            :space-between="16"
+            :loop="true"
+            :centered-slides="false"
+            class="quick-actions-swiper !pb-3"
+            @swiper="onSwiper"
+            @slide-change="onSlideChange"
+            :navigation="{
+              prevEl: '.quick-actions-prev',
+              nextEl: '.quick-actions-next',
+            }"
+          >
           <SwiperSlide
             v-for="(tile, index) in tileItems"
             :key="tile.name"
@@ -102,6 +103,7 @@
             </router-link>
           </SwiperSlide>
         </Swiper>
+        </div>
 
         <!-- Dot indicators (pagination) -->
         <div class="flex items-center justify-center gap-2 mt-4">
@@ -125,7 +127,7 @@
           <!-- Card header -->
           <div class="px-4 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-col gap-0.5">
-              <h2 class="text-lg font-semibold text-white">Access Logs</h2>
+              <h2 class="text-lg font-semibold text-white">Activity Logs</h2>
               <p class="text-xs text-white/45">Covers the past 30 days · audit key member activities</p>
             </div>
             <p v-if="records" class="text-xs text-white/40">
@@ -259,6 +261,13 @@
         <Pagination />
       </div>
     </div>
+
+    <!-- Newsletter-style announcement popup (pops up upon login / dashboard visit) -->
+    <AnnouncementPopup
+      :show="showAnnouncementPopup"
+      :announcement="latestAnnouncement || {}"
+      @dismiss="onAnnouncementDismiss"
+    />
   </div>
 </template>
 
@@ -310,12 +319,12 @@ const slideToIndex = (i) => {
 
 // ── Tile items ───────────────────────────────────────────
 const tileItems = computed(() => [
-  {
-    name: 'Book a Court',
-    emoji: '🎾',
-    description: 'Reserve your preferred court and time slot.',
-    link: '/courts/book',
-  },
+  // {
+  //   name: 'Book a Court',
+  //   emoji: '🎾',
+  //   description: 'Reserve your preferred court and time slot.',
+  //   link: '/courts/book',
+  // },
   {
     name: 'My Schedule',
     emoji: '📅',
@@ -404,7 +413,44 @@ const fetchRecords = async () => {
   }
 };
 
-onMounted(() => fetchRecords());
+// ── Announcement popup (newsletter on dashboard load) ─────────────────────
+const latestAnnouncement = ref(null);
+const showAnnouncementPopup = ref(false);
+const ANNOUNCEMENT_DISMISSED_KEY = 'dashboard-announcement-dismissed-id';
+
+const fetchLatestAnnouncement = async () => {
+  try {
+    const response = await nuxtApp.$axios.get('/cms/announcements?page=1&per_page=10');
+    const rec = response.data?.records;
+    const data = Array.isArray(rec) ? rec : rec?.data;
+    if (!Array.isArray(data) || !data.length) return;
+    const enabledList = data.filter((a) => a.enabled);
+    const latest = enabledList.length
+      ? enabledList.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))[0]
+      : null;
+    if (latest) {
+      latestAnnouncement.value = latest;
+      const dismissedId = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(ANNOUNCEMENT_DISMISSED_KEY) : null;
+      if (String(latest.id) !== dismissedId) {
+        showAnnouncementPopup.value = true;
+      }
+    }
+  } catch (error) {
+    console.error('Announcement fetch error:', error);
+  }
+};
+
+const onAnnouncementDismiss = () => {
+  showAnnouncementPopup.value = false;
+  if (latestAnnouncement.value?.id && typeof sessionStorage !== 'undefined') {
+    sessionStorage.setItem(ANNOUNCEMENT_DISMISSED_KEY, String(latestAnnouncement.value.id));
+  }
+};
+
+onMounted(() => {
+  fetchRecords();
+  fetchLatestAnnouncement();
+});
 watch(() => pagination.page, () => fetchRecords());
 
 // ── Badge helpers ────────────────────────────────────────
@@ -450,6 +496,34 @@ const getActionIcon = (action) => {
 @media (min-width: 768px) {
   .quick-actions-swiper :deep(.swiper-slide) {
     width: 288px;
+  }
+}
+
+/* Mask so tiles fade at left/right when partially visible */
+.quick-actions-mask {
+  --fade-width: 56px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--fade-width),
+    black calc(100% - var(--fade-width)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--fade-width),
+    black calc(100% - var(--fade-width)),
+    transparent 100%
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+@media (min-width: 768px) {
+  .quick-actions-mask {
+    --fade-width: 72px;
   }
 }
 </style>
