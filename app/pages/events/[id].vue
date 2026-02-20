@@ -25,11 +25,14 @@
           <p class="text-sm text-white/50 mt-1">Update the details for this club event.</p>
         </div>
 
-        <!-- Event type badge (populated after fetch) -->
-        <div v-if="eventData?.event_type" class="shrink-0 mt-1">
-          <span class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#C9A227]/15 text-[#D4AF37] border border-[#C9A227]/25 capitalize">
+        <!-- Event type & status badges (populated after fetch) -->
+        <div class="shrink-0 mt-1 flex items-center gap-2">
+          <span v-if="eventData?.event_type" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#C9A227]/15 text-[#D4AF37] border border-[#C9A227]/25 capitalize">
             <span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
             {{ eventData.event_type }}
+          </span>
+          <span v-if="eventData?.event_status" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15 capitalize">
+            {{ eventData.event_status }}
           </span>
         </div>
       </header>
@@ -149,6 +152,96 @@
           </div>
         </div>
 
+        <!-- ── Tennis-Specific Fields Card ── -->
+        <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
+          <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
+          <div class="px-6 py-5 border-b border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M3.75 9h16.5m-7.5 6h.008v.008h-.008V15zM3.75 3.75h.008v.008H3.75V3.75zm0 12h.008v.008H3.75v-.008zm12 0h.008v.008h-.008v-.008zm0-12h.008v.008h-.008V3.75z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-white">Tennis-Specific Fields</h2>
+              <p class="text-xs text-white/40">Match type, format, and scoring (for tennis-related events)</p>
+            </div>
+          </div>
+          <div class="p-6 flex flex-col gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Match Type</label>
+                <SelectField
+                  name="match_type"
+                  v-model="formData.match_type"
+                  placeholder="Select"
+                  :options="matchTypeOptions"
+                  :rules="''"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Format</label>
+                <SelectField
+                  name="format"
+                  v-model="formData.format"
+                  placeholder="Select"
+                  :options="formatOptions"
+                  :rules="''"
+                />
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Scoring format</label>
+              <TextField
+                name="scoring_format"
+                v-model="formData.scoring_format"
+                placeholder="e.g. 1 set, 8-game pro set"
+                :rules="'max:255'"
+                optionalMessage="Scoring format"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Host & Management Card ── -->
+        <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
+          <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
+          <div class="px-6 py-5 border-b border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-white">Host & Management</h2>
+              <p class="text-xs text-white/40">Assigned coach and event status</p>
+            </div>
+          </div>
+          <div class="p-6 flex flex-col gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Assigned Coach</label>
+                <TextField
+                  name="assigned_coach"
+                  v-model="formData.assigned_coach"
+                  placeholder="Coach name"
+                  :rules="'max:255'"
+                  optionalMessage="Assigned coach"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Event Status</label>
+                <SelectField
+                  name="event_status"
+                  v-model="formData.event_status"
+                  placeholder="Select status"
+                  :options="eventStatusOptions"
+                  :rules="''"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ── Gallery Card ── -->
         <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
           <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
@@ -245,13 +338,41 @@ const eventTypeOptions = [
   { value: 'other',      label: 'Other'       },
 ];
 
+const matchTypeOptions = [
+  { value: '',        label: '— Select —' },
+  { value: 'singles', label: 'Singles'    },
+  { value: 'doubles', label: 'Doubles'    },
+  { value: 'mixed',   label: 'Mixed'      },
+];
+
+const formatOptions = [
+  { value: '',            label: '— Select —'   },
+  { value: 'round_robin', label: 'Round Robin'  },
+  { value: 'knockout',    label: 'Knockout'     },
+  { value: 'ladder',      label: 'Ladder'       },
+  { value: 'timed_play',  label: 'Timed Play'   },
+];
+
+const eventStatusOptions = [
+  { value: '',           label: '— Select —'  },
+  { value: 'draft',      label: 'Draft'       },
+  { value: 'published',  label: 'Published'  },
+  { value: 'cancelled',  label: 'Cancelled'  },
+  { value: 'completed',  label: 'Completed'   },
+];
+
 const formData = reactive({
-  title:      '',
-  content:    '',
-  date:       '',
-  location:   '',
-  event_type: '',
-  enabled:    true,
+  title:           '',
+  content:         '',
+  date:            '',
+  location:        '',
+  event_type:      '',
+  enabled:         true,
+  match_type:      '',
+  format:          '',
+  scoring_format:  '',
+  assigned_coach:  '',
+  event_status:    '',
 });
 
 const formDataFiles = reactive({ event_gallery: [] });
@@ -284,14 +405,19 @@ const fetchRecord = async () => {
 
 const populateData = (data) => {
   if (!data) return;
-  formData.title      = data.title      || '';
-  formData.content    = data.content    || '';
-  formData.date       = data.date
+  formData.title           = data.title           || '';
+  formData.content         = data.content         || '';
+  formData.date            = data.date
     ? (typeof data.date === 'string' && data.date.includes(' ') ? data.date.split(' ')[0] : data.date)
     : '';
-  formData.location   = data.location   || '';
-  formData.event_type = data.event_type || '';
-  formData.enabled    = Boolean(data.enabled);
+  formData.location        = data.location        || '';
+  formData.event_type      = data.event_type      || '';
+  formData.enabled         = Boolean(data.enabled);
+  formData.match_type      = data.match_type      || '';
+  formData.format          = data.format          || '';
+  formData.scoring_format  = data.scoring_format  || '';
+  formData.assigned_coach  = data.assigned_coach  || '';
+  formData.event_status    = data.event_status   || '';
 
   const gallery = data.gallery
     || data.images?.filter((img) => img.category === 'event_gallery')
@@ -304,10 +430,15 @@ const submit = async () => {
   const formElement = document.getElementById('form');
   const form_data   = new FormData(formElement);
   form_data.append('_method',     'PATCH');
-  form_data.append('content',     formData.content    || '');
-  form_data.append('location',    formData.location   || '');
-  form_data.append('event_type',  formData.event_type || '');
-  form_data.append('enabled',     formData.enabled ? '1' : '0');
+  form_data.append('content',          formData.content          || '');
+  form_data.append('location',         formData.location         || '');
+  form_data.append('event_type',       formData.event_type       || '');
+  form_data.append('enabled',          formData.enabled ? '1' : '0');
+  form_data.append('match_type',       formData.match_type       || '');
+  form_data.append('format',           formData.format           || '');
+  form_data.append('scoring_format',   formData.scoring_format   || '');
+  form_data.append('assigned_coach',   formData.assigned_coach   || '');
+  form_data.append('event_status',     formData.event_status     || '');
 
   (formDataFiles.event_gallery || []).forEach((file) => {
     if (file instanceof File) form_data.append('event_gallery[]', file);
