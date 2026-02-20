@@ -1,10 +1,13 @@
 <template>
   <div class="flex bg-offwhite h-screen overflow-hidden">
     <template v-if="showChrome">
-      <Topbar />
-      <div class="flex flex-col w-full overflow-x-auto">
-        <PageTitle v-if="route.name !== 'dashboard' && pageTitle.title" />
-        <slot />
+      <Sidebar />
+      <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <Topbar />
+        <div class="flex flex-col w-full overflow-x-auto flex-1">
+          <PageTitle v-if="route.name !== 'dashboard' && pageTitle.title" />
+          <slot />
+        </div>
       </div>
     </template>
     <template v-else>

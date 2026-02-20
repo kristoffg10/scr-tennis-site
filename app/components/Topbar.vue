@@ -1,12 +1,24 @@
 <template>
-  <div class="fixed top-0 left-0 flex items-center justify-between h-[94px] w-full bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] border-b border-[#C9A227]/20 backdrop-blur-sm z-40 px-4 lg:px-8">
+  <div class="fixed top-0 left-0 md:left-[260px] right-0 flex items-center justify-between h-[94px] bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] border-b border-[#C9A227]/20 backdrop-blur-sm z-40 px-4 lg:px-8">
       <!-- Gold top stripe -->
       <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
 
-      <!-- Home button -->
+      <!-- Mobile: menu button to open sidebar drawer -->
+      <button
+        type="button"
+        class="md:hidden relative z-10 flex items-center justify-center w-10 h-10 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#D4AF37] transition-colors touch-manipulation"
+        aria-label="Open menu"
+        @click.stop="openSidebar"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <!-- Desktop: Home button (hidden on mobile when we show menu) -->
       <router-link
           to="/dashboard"
-          class="flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 hover:border-[#C9A227]/50 transition-colors group"
+          class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 hover:border-[#C9A227]/50 transition-colors group"
           aria-label="Go to Dashboard"
       >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[#D4AF37]">
@@ -15,8 +27,142 @@
           <span class="text-sm font-medium text-white/80 group-hover:text-[#D4AF37] transition-colors hidden sm:inline">Dashboard</span>
       </router-link>
 
-      <!-- Right: user dropdown -->
+      <!-- Right: time & weather, notification (activity logs), user dropdown -->
       <div class="flex justify-end items-center gap-x-[12px] ml-auto">
+          <!-- Time & weather (IP-based location) -->
+          <div class="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/5 text-white/80">
+              <div class="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#D4AF37]/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span class="text-sm tabular-nums">{{ currentTime }}</span>
+              </div>
+              <div v-if="weatherLoading" class="flex items-center gap-1.5 text-white/50">
+                  <span class="w-4 h-4 rounded-full border-2 border-[#C9A227]/30 border-t-[#D4AF37] animate-spin" />
+                  <span class="text-xs">Weather…</span>
+              </div>
+              <button
+                  v-else-if="weatherError"
+                  type="button"
+                  class="flex items-center gap-1.5 text-white/50 hover:text-white/70 transition-colors"
+                  title="Weather couldn’t be loaded. Click to retry."
+                  @click="fetchLocationAndWeather()"
+              >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                  </svg>
+                  <span class="text-xs">Retry weather</span>
+              </button>
+              <div v-else-if="weatherTemp != null" class="flex items-center gap-1.5 flex-wrap" :title="weatherLocation ? `${weatherDesc} in ${weatherLocation}` : weatherDesc">
+                  <span class="text-[#D4AF37]/90">{{ weatherIcon }}</span>
+                  <span class="text-sm tabular-nums">{{ weatherTemp }}°</span>
+                  <span v-if="weatherDesc" class="text-xs text-white/60">{{ weatherDesc }}</span>
+                  <span v-if="weatherLocation" class="text-xs text-white/50 truncate max-w-[80px]" :title="weatherLocation">{{ weatherLocation }}</span>
+              </div>
+          </div>
+          <!-- Activity logs bell: on mobile go to page, on desktop open popup -->
+          <NuxtLink
+              to="/activity-logs"
+              class="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#D4AF37] transition-colors"
+              aria-label="Activity logs"
+          >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+          </NuxtLink>
+          <div class="hidden md:block relative" data-activity-popup>
+              <button
+                  type="button"
+                  @click.stop="toggleActivityPopup"
+                  class="flex items-center justify-center w-10 h-10 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#D4AF37] transition-colors"
+                  :class="{ 'bg-[#C9A227]/20 border-[#C9A227]/40': showActivityPopup }"
+                  aria-label="Activity logs"
+                  aria-haspopup="true"
+                  :aria-expanded="showActivityPopup"
+              >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
+              </button>
+
+              <!-- Activity logs popup (messenger-style, desktop only) -->
+              <Transition name="dropdown">
+                  <div
+                      v-show="showActivityPopup"
+                      class="absolute top-full left-0 right-0 mx-3 mt-2 sm:left-auto sm:right-0 sm:mx-0 sm:w-[380px] rounded-2xl border border-[#C9A227]/25 bg-[#0D2818] shadow-2xl overflow-hidden flex flex-col max-h-[70vh] sm:max-h-[480px] z-50"
+                      role="dialog"
+                      aria-label="Recent activity"
+                  >
+                      <div class="h-0.5 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37] shrink-0" />
+                      <div class="px-4 sm:px-5 py-4 border-b border-white/10 shrink-0">
+                          <h3 class="text-base font-semibold text-white">Recent activity</h3>
+                          <p class="text-xs text-white/50 mt-1">Latest 5 logs</p>
+                      </div>
+                      <div class="activity-logs-scroll overflow-y-auto flex-1 min-h-0 px-3 sm:px-4 py-4 flex flex-col gap-3">
+                          <div v-if="activityLogsLoading" class="py-10 flex items-center justify-center">
+                              <span class="w-6 h-6 rounded-full border-2 border-[#C9A227]/30 border-t-[#D4AF37] animate-spin" />
+                          </div>
+                          <template v-else-if="latestActivityLogs.length">
+                              <div
+                                  v-for="record in latestActivityLogs"
+                                  :key="record.id"
+                                  :class="[
+                                      'px-4 py-3.5 rounded-xl flex flex-col gap-2 transition-colors',
+                                      isLoginAction(record.action) && 'bg-emerald-500/10 border border-emerald-400/25',
+                                      isLogoutAction(record.action) && 'bg-rose-500/10 border border-rose-400/25',
+                                      !isLoginAction(record.action) && !isLogoutAction(record.action) && 'bg-white/[0.06] border border-white/10'
+                                  ]"
+                              >
+                                  <div class="flex flex-wrap items-center justify-between gap-2">
+                                      <p class="text-sm font-medium text-white truncate">
+                                          {{ record.user?.user_detail?.full_name || record.user?.email || '--' }}
+                                      </p>
+                                      <span
+                                          :class="[
+                                              'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full shrink-0',
+                                              getActionBadgeClass(record.action)
+                                          ]"
+                                      >
+                                          <template v-if="getActionIcon(record.action) === 'login'">
+                                              <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                              </svg>
+                                          </template>
+                                          <template v-else-if="getActionIcon(record.action) === 'logout'">
+                                              <svg class="w-3.5 h-3.5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                              </svg>
+                                          </template>
+                                          <template v-else>
+                                              <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="getActionDotClass(record.action)" />
+                                          </template>
+                                          {{ record.action }}
+                                      </span>
+                                  </div>
+                                  <p v-if="record.page || record.item_name" class="text-xs text-white/60 leading-snug">
+                                      {{ record.page ? record.page : '' }}{{ record.page && record.item_name ? ' · ' : '' }}{{ record.item_name || '' }}
+                                  </p>
+                                  <p class="text-xs text-white/45">
+                                      {{ $moment(record.created_at).format('MMM DD, hh:mm A') }}
+                                  </p>
+                              </div>
+                          </template>
+                          <div v-else class="py-10 text-center text-sm text-white/40">
+                              No recent activity.
+                          </div>
+                      </div>
+                      <div class="px-3 sm:px-4 py-4 border-t border-white/10 shrink-0 bg-[#0D2818]">
+                          <NuxtLink
+                              to="/activity-logs"
+                              class="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-[#C9A227]/30 bg-[#C9A227]/15 hover:bg-[#C9A227]/25 text-[#D4AF37] text-sm font-medium transition-colors"
+                              @click="showActivityPopup = false"
+                          >
+                              View all logs
+                          </NuxtLink>
+                      </div>
+                  </div>
+              </Transition>
+          </div>
           <div @click="toggled()" class="flex justify-center gap-x-[8px] items-center py-[6px] px-[14px] relative cursor-pointer rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 transition-colors" :class="{'bg-[#C9A227]/20 border-[#C9A227]/40' : isToggled}">
               <h1 v-if="displayUser" class="text-base font-medium text-white" :class="{'text-[#D4AF37]' : isToggled}">{{ displayUser?.user_detail?.full_name ?? displayUser?.email ?? 'User' }}</h1>
               <p v-else class="text-sm text-white/60">Loading user data...</p>
@@ -118,17 +264,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useAuth } from '#imports';
 import { useAuthStore } from '~/stores/auth';
+import { useSidebarStore } from '~/stores/sidebar';
 
 const auth = useAuth();
+const sidebarStore = useSidebarStore();
+const nuxtApp = useNuxtApp();
+
+const openSidebar = () => {
+  sidebarStore.setMobileSidebarOpen(true);
+};
 const user = ref(null);
 const authStore = useAuthStore();
 
 const displayUser = computed(() => authStore.user || user.value);
 
 onMounted(async () => {
+  updateTime();
+  timeInterval = setInterval(updateTime, 1000);
+  fetchLocationAndWeather();
   try {
     const session = await auth.getSession();
     if (session && session.user) {
@@ -145,9 +301,212 @@ onMounted(async () => {
   }
 });
 
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval);
+});
+
 const isToggled = ref(false);
 const toggled = () => {
   isToggled.value = !isToggled.value;
+};
+
+// ── Time (updates every second) ──
+const currentTime = ref('');
+const updateTime = () => {
+  const now = new Date();
+  currentTime.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+};
+let timeInterval = null;
+
+// ── Weather (IP-based location: ip-api.com → Open-Meteo) ──
+const weatherLoading = ref(true);
+const weatherError = ref(false);
+const weatherTemp = ref(null);
+const weatherDesc = ref('');
+const weatherLocation = ref('');
+const weatherIcon = ref('');
+
+const WEATHER_CODES = {
+  0: { desc: 'Clear', icon: '☀️' },
+  1: { desc: 'Mainly clear', icon: '🌤️' },
+  2: { desc: 'Partly cloudy', icon: '⛅' },
+  3: { desc: 'Overcast', icon: '☁️' },
+  45: { desc: 'Foggy', icon: '🌫️' },
+  48: { desc: 'Foggy', icon: '🌫️' },
+  51: { desc: 'Drizzle', icon: '🌧️' },
+  53: { desc: 'Drizzle', icon: '🌧️' },
+  55: { desc: 'Drizzle', icon: '🌧️' },
+  61: { desc: 'Rain', icon: '🌧️' },
+  63: { desc: 'Rain', icon: '🌧️' },
+  65: { desc: 'Heavy rain', icon: '⛈️' },
+  71: { desc: 'Snow', icon: '❄️' },
+  73: { desc: 'Snow', icon: '❄️' },
+  75: { desc: 'Heavy snow', icon: '❄️' },
+  77: { desc: 'Snow grains', icon: '❄️' },
+  80: { desc: 'Showers', icon: '🌦️' },
+  81: { desc: 'Showers', icon: '🌦️' },
+  82: { desc: 'Heavy showers', icon: '⛈️' },
+  85: { desc: 'Snow showers', icon: '🌨️' },
+  86: { desc: 'Snow showers', icon: '🌨️' },
+  95: { desc: 'Thunderstorm', icon: '⛈️' },
+  96: { desc: 'Thunderstorm', icon: '⛈️' },
+  99: { desc: 'Thunderstorm', icon: '⛈️' },
+};
+
+const fetchWithTimeout = (url, ms = 8000) => {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t));
+};
+
+const fetchLocationAndWeather = async () => {
+  weatherLoading.value = true;
+  weatherError.value = false;
+  try {
+    let lat = null;
+    let lon = null;
+    let city = '';
+
+    const config = useRuntimeConfig();
+    const key = (config.public?.ipApiKey || '').trim();
+    const ipApiUrl = key
+      ? `https://pro.ip-api.com/json/?key=${encodeURIComponent(key)}&fields=lat,lon,city,regionName`
+      : 'https://ip-api.com/json/?fields=lat,lon,city,regionName';
+
+    try {
+      const ipRes = await fetchWithTimeout(ipApiUrl);
+      if (!ipRes.ok) throw new Error(`ip-api ${ipRes.status}`);
+      const ipData = await ipRes.json();
+      if (ipData.lat != null && ipData.lon != null) {
+        lat = ipData.lat;
+        lon = ipData.lon;
+        city = ipData.city || ipData.regionName || '';
+      }
+    } catch (_) {
+      lat = null;
+      lon = null;
+    }
+
+    if (lat == null || lon == null) {
+      const fallbackRes = await fetchWithTimeout('https://ipapi.co/json/');
+      if (!fallbackRes.ok) throw new Error('IP lookup failed');
+      const fallbackData = await fallbackRes.json();
+      lat = fallbackData.latitude;
+      lon = fallbackData.longitude;
+      city = fallbackData.city || fallbackData.region || '';
+    }
+
+    if (lat == null || lon == null) throw new Error('No location');
+    if (city) weatherLocation.value = city;
+
+    const weatherRes = await fetchWithTimeout(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`
+    );
+    if (!weatherRes.ok) throw new Error('Weather fetch failed');
+    const weatherData = await weatherRes.json();
+    const cur = weatherData?.current;
+    if (!cur) throw new Error('No weather data');
+    weatherTemp.value = Math.round(cur.temperature_2m);
+    const code = cur.weather_code;
+    const mapped = WEATHER_CODES[code] || { desc: 'Unknown', icon: '🌡️' };
+    weatherDesc.value = mapped.desc;
+    weatherIcon.value = mapped.icon;
+  } catch (e) {
+    console.warn('Weather by IP failed:', e);
+    weatherError.value = true;
+    weatherTemp.value = null;
+    weatherDesc.value = '';
+    weatherLocation.value = '';
+    weatherIcon.value = '';
+  } finally {
+    weatherLoading.value = false;
+  }
+};
+
+// Activity logs popup
+const showActivityPopup = ref(false);
+const activityLogsRaw = ref(null);
+const activityLogsLoading = ref(false);
+
+const latestActivityLogs = computed(() => {
+  const rec = activityLogsRaw.value;
+  if (!rec) return [];
+  let list = [];
+  if (Array.isArray(rec)) list = rec;
+  else if (Array.isArray(rec.data)) list = rec.data;
+  else if (rec.records && Array.isArray(rec.records.data)) list = rec.records.data;
+  return list.slice(0, 5);
+});
+
+const fetchLatestLogs = async () => {
+  activityLogsLoading.value = true;
+  try {
+    const response = await nuxtApp.$axios.get('/cms/dashboard?page=1');
+    activityLogsRaw.value = response.data?.records ?? response.data ?? null;
+  } catch (err) {
+    console.error('Failed to fetch activity logs:', err);
+    activityLogsRaw.value = null;
+  } finally {
+    activityLogsLoading.value = false;
+  }
+};
+
+const toggleActivityPopup = () => {
+  showActivityPopup.value = !showActivityPopup.value;
+  if (showActivityPopup.value) {
+    fetchLatestLogs();
+    isToggled.value = false;
+  }
+};
+
+let activityPopupClickCleanup = null;
+watch(showActivityPopup, (open) => {
+  if (activityPopupClickCleanup) {
+    activityPopupClickCleanup();
+    activityPopupClickCleanup = null;
+  }
+  if (!open) return;
+  const close = (e) => {
+    const el = e.target;
+    if (el.closest('[data-activity-popup]')) return;
+    showActivityPopup.value = false;
+  };
+  const remove = () => document.removeEventListener('click', close);
+  activityPopupClickCleanup = remove;
+  setTimeout(() => document.addEventListener('click', close), 0);
+});
+
+const isLoginAction = (action) =>
+  typeof action === 'string' && action.toLowerCase().includes('logged in');
+const isLogoutAction = (action) =>
+  typeof action === 'string' && action.toLowerCase().includes('logout');
+
+const getActionBadgeClass = (action) => {
+  if (isLoginAction(action)) return 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
+  if (isLogoutAction(action)) return 'bg-rose-500/20 text-rose-300 border border-rose-400/30';
+  switch (action) {
+    case 'Created': return 'bg-emerald-500/15 text-emerald-400 border border-transparent';
+    case 'Deleted': return 'bg-red-500/15 text-red-400 border border-transparent';
+    case 'Changed': return 'bg-amber-500/15 text-amber-400 border border-transparent';
+    default: return 'bg-[#C9A227]/15 text-[#D4AF37] border border-transparent';
+  }
+};
+
+const getActionDotClass = (action) => {
+  if (isLoginAction(action)) return 'bg-emerald-400';
+  if (isLogoutAction(action)) return 'bg-rose-400';
+  switch (action) {
+    case 'Created': return 'bg-emerald-400';
+    case 'Deleted': return 'bg-red-400';
+    case 'Changed': return 'bg-amber-400';
+    default: return 'bg-[#D4AF37]';
+  }
+};
+
+const getActionIcon = (action) => {
+  if (isLoginAction(action)) return 'login';
+  if (isLogoutAction(action)) return 'logout';
+  return null;
 };
 
 const showLogoutConfirm = ref(false);
@@ -183,5 +542,35 @@ const logout = async () => {
 .modal-enter-from .relative,
 .modal-leave-to .relative {
   transform: scale(0.95);
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Themed scrollbar for activity logs popup (gold/olive, not blue) */
+.activity-logs-scroll {
+  scrollbar-color: #C9A227 #1a3c29;
+  scrollbar-width: thin;
+}
+.activity-logs-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.activity-logs-scroll::-webkit-scrollbar-track {
+  background: #1a3c29;
+  border-radius: 3px;
+}
+.activity-logs-scroll::-webkit-scrollbar-thumb {
+  background: #C9A227;
+  border-radius: 3px;
+}
+.activity-logs-scroll::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
 }
 </style>

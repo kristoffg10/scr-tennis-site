@@ -26,6 +26,8 @@ export default defineNuxtConfig({
             apiURL: process.env.NUXT_PUBLIC_API_URL || 'https://ilb-api.designbluemanila.com/api/v1',
             baseURL: '/',
             webURL: process.env.NUXT_PUBLIC_WEB_URL,
+            /** Optional: ip-api.com Pro key (https://ip-api.com/docs/api) – leave empty for free tier */
+            ipApiKey: process.env.NUXT_PUBLIC_IP_API_KEY || '',
         },
     },
 

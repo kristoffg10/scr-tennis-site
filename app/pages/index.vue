@@ -1,7 +1,26 @@
 <template>
   <div
-    class="min-h-screen w-full relative bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] flex items-center justify-center px-6 py-10"
+    class="min-h-screen w-full relative flex items-center justify-center px-6 py-10 overflow-hidden"
   >
+    <!-- Full-screen video background -->
+    <video
+      ref="bgVideo"
+      autoplay
+      muted
+      loop
+      playsinline
+      class="absolute inset-0 w-full h-full object-cover"
+      aria-hidden="true"
+    >
+      <source src="/images/tennis-match.mp4" type="video/mp4" />
+    </video>
+
+    <!-- Dark overlay so text stays visible -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-[#0D2818]/85 via-[#1a3c29]/80 to-[#2d5a3d]/75"
+      aria-hidden="true"
+    />
+
     <!-- Subtle texture overlay -->
     <div
       class="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -11,12 +30,12 @@
 
     <!-- Decorative gold accent -->
     <div
-      class="pointer-events-none absolute -z-10 top-0 right-0 w-96 h-96 bg-[#C9A227]/10 rounded-full blur-3xl"
+      class="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-[#C9A227]/10 rounded-full blur-3xl"
       aria-hidden="true"
     />
 
     <!-- Hero content - centered homepage -->
-    <section class="relative w-full max-w-2xl mx-auto text-center flex flex-col items-center gap-8">
+    <section class="relative z-10 w-full max-w-2xl mx-auto text-center flex flex-col items-center gap-8">
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40">
         <span class="text-[#D4AF37] text-lg">🎾</span>
         <span class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]">Members Only</span>
@@ -194,9 +213,14 @@
 import { useForm, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 import { useAuth } from "#imports";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const auth = useAuth();
+const bgVideo = ref(null);
+
+onMounted(() => {
+  bgVideo.value?.play().catch(() => {});
+});
 const showLoginModal = ref(false);
 
 const { handleSubmit, errors } = useForm({

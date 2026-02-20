@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed top-[94px] left-0 right-0 z-30 flex flex-col">
+    <div class="fixed top-[94px] left-0 md:left-[260px] right-0 z-30 flex flex-col">
       <!-- Back link -->
       <router-link
         v-if="pageTitle.pageFrom"

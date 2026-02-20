@@ -11,7 +11,7 @@
         transition cursor-pointer p-[20px] min-h-[124px] h-auto flex justify-center items-center group duration-500"
       :class="{ 'border-danger': fileError, 'border-gray': fileError === '' }" @click="triggerFileInput"
       @drop.prevent="handleFileDrop" @dragover.prevent>
-      <input ref="fileInput" type="file" class="hidden" :accept="acceptedFormats" @change="handleFileChange" />
+      <input ref="fileInput" type="file" class="hidden" :accept="acceptedFormats" :multiple="parseInt(max, 10) > 1" @change="handleFileChange" />
       <span class="w-[40px] h-[36px] mr-[16px]">
         <svg xmlns="http://www.w3.org/2000/svg" width="44" height="40" viewBox="0 0 44 40" fill="none"
           class="opacity-20 group-hover:opacity-100 transition">
@@ -33,7 +33,7 @@
     </div>
     <p v-if="fileError" class="text-danger text-base mt-1">{{ fileError }}</p>
     <div v-if="imageUrls.length" v-for="(url, index) in imageUrls" :key="index"
-      class="relative px-[20px] py-[16px] bg-[#457e68] rounded-[10px] flex gap-[16px] items-center justify-between">
+      class="relative px-[20px] py-[16px] bg-[#315a5c] rounded-[10px] flex gap-[16px] items-center justify-between">
       <div v-if="type === 'amenity_gallery'" class="flex gap-[8px] w-[384px]">
         <div class="w-[70px] h-[54px] aspect-ratio rounded-[5px] overflow-hidden">
           <img :src="url" class="w-full h-full object-cover" alt="Preview" />
@@ -127,7 +127,7 @@ const props = defineProps({
   size: String,
   acceptedFormats: {
     type: String,
-    default: 'image/jpeg, image/png, image/webp, image/svg'
+    default: '.jpeg, .png, .webp, .svg'
   },
   input_payload: {
     type: Object,
