@@ -16,7 +16,7 @@
       </button>
 
       <!-- Desktop: Home button (hidden on mobile when we show menu) -->
-      <router-link
+      <!-- <router-link
           to="/dashboard"
           class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 hover:border-[#C9A227]/50 transition-colors group"
           aria-label="Go to Dashboard"
@@ -25,7 +25,7 @@
               <path d="M3 9.5L12 3L21 9.5V20C21 20.5523 20.5523 21 20 21H15V15H9V21H4C3.44772 21 3 20.5523 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span class="text-sm font-medium text-white/80 group-hover:text-[#D4AF37] transition-colors hidden sm:inline">Dashboard</span>
-      </router-link>
+      </router-link> -->
 
       <!-- Right: time & weather, notification (activity logs), user dropdown -->
       <div class="flex justify-end items-center gap-x-[12px] ml-auto">

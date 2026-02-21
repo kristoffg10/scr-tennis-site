@@ -121,6 +121,7 @@ const careers = ref(null);
 
 // Redirect if role does not have careers permission (defense in depth with middleware)
 const hasCareersPermission = () => {
+  if (authStore.isSuperAdmin) return true;
   const user = authStore.user;
   if (!user?.role?.permissions) return false;
   try {

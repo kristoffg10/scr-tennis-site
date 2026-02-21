@@ -188,6 +188,7 @@ const ALLOWED_ROLE_IDS_FOR_CHANGE_ROLE = [
   'fa5e772f-5715-4dea-9922-351e8e27bdab',
 ];
 const canChangeEditorRole = computed(() => {
+  if (authStore.isSuperAdmin) return true;
   const roleId = authStore.user?.role?.id ?? authStore.user?.role_id ?? '';
   return ALLOWED_ROLE_IDS_FOR_CHANGE_ROLE.includes(roleId);
 });

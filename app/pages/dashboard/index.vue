@@ -120,14 +120,75 @@
           />
         </div>
       </section>
-    </div>
 
-    <!-- Newsletter-style announcement popup (pops up upon login / dashboard visit) -->
-    <AnnouncementPopup
-      :show="showAnnouncementPopup"
-      :announcement="latestAnnouncement || {}"
-      @dismiss="onAnnouncementDismiss"
-    />
+      <!-- Upcoming Event (left) + Latest Announcement (right) -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left: Upcoming Event -->
+        <div
+          class="rounded-2xl overflow-hidden border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm"
+        >
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+            <div class="w-8 h-8 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+              </svg>
+            </div>
+            <h2 class="text-sm font-semibold text-white/90 tracking-wide uppercase">Upcoming Event</h2>
+          </div>
+          <div class="p-4">
+            <template v-if="upcomingEvent">
+              <NuxtLink
+                :to="`/events/view/${upcomingEvent.id}`"
+                class="block group rounded-xl border border-[#C9A227]/20 bg-white/5 hover:border-[#C9A227]/40 hover:bg-white/10 transition-all p-4"
+              >
+                <p class="text-base font-semibold text-white group-hover:text-[#D4AF37] transition-colors">{{ upcomingEvent.title || '—' }}</p>
+                <p class="text-xs text-white/50 mt-1">{{ $moment(upcomingEvent.date).format('ddd, MMM DD, YYYY') }}</p>
+                <span class="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-[#D4AF37]">
+                  View event
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </span>
+              </NuxtLink>
+            </template>
+            <p v-else class="text-sm text-white/40 py-4">No upcoming events.</p>
+          </div>
+        </div>
+
+        <!-- Right: Latest Announcement -->
+        <div
+          class="rounded-2xl overflow-hidden border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm"
+        >
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+            <div class="w-8 h-8 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 1 8.835-2.535m0 0A23.74 23.74 0 0 1 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"/>
+              </svg>
+            </div>
+            <h2 class="text-sm font-semibold text-white/90 tracking-wide uppercase">Latest Announcement</h2>
+          </div>
+          <div class="p-4">
+            <template v-if="latestAnnouncement">
+              <NuxtLink
+                to="/announcements"
+                class="block group rounded-xl border border-[#C9A227]/20 bg-white/5 hover:border-[#C9A227]/40 hover:bg-white/10 transition-all p-4"
+              >
+                <p class="text-base font-semibold text-white group-hover:text-[#D4AF37] transition-colors">{{ latestAnnouncement.title || 'Announcement' }}</p>
+                <p class="text-xs text-white/50 mt-1">{{ $moment(latestAnnouncement.date).format('MMM DD, YYYY') }}</p>
+                <p v-if="announcementExcerpt" class="text-sm text-white/60 mt-2 line-clamp-2">{{ announcementExcerpt }}</p>
+                <span class="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-[#D4AF37]">
+                  View all announcements
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </span>
+              </NuxtLink>
+            </template>
+            <p v-else class="text-sm text-white/40 py-4">No announcements yet.</p>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -139,6 +200,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { useAuthStore } from '~/stores/auth';
 
+const nuxtApp = useNuxtApp();
 const swiperModules = [Navigation];
 
 definePageMeta({
@@ -194,7 +256,7 @@ const tileItems = computed(() => [
     link: '/events',
   },
   {
-    name: 'Member Directory',
+    name: 'Members',
     emoji: '👥',
     description: 'Find and connect with fellow club members.',
     link: '/admin-settings/cms-editors',
@@ -204,6 +266,12 @@ const tileItems = computed(() => [
     emoji: '📢',
     description: 'Stay up-to-date on club news and notices.',
     link: '/announcements',
+  },
+  {
+    name: 'Roles',
+    emoji: '🔑',
+    description: 'Manage roles and permissions.',
+    link: '/admin-settings/roles',
   },
   {
     name: 'My Profile',
@@ -227,15 +295,62 @@ const userUniques = computed(() => {
 });
 
 const isAuthorized = (unique) => {
+  if (auth.isSuperAdmin) return true;
   const list = userUniques.value;
   if (!list.length) return true;
   return list.includes(unique);
 };
 
-// ── Announcement popup (newsletter on dashboard load) ─────────────────────
+// ── Upcoming event (left section) ────────────────────────────────────────
+const upcomingEvent = ref(null);
+
+const fetchUpcomingEvent = async () => {
+  try {
+    const nuxtApp = useNuxtApp(); // ← was missing!
+    const todayStr = nuxtApp.$moment().format('YYYY-MM-DD');
+    const oneYearLater = nuxtApp.$moment().add(1, 'year').format('YYYY-MM-DD');
+
+    const response = await nuxtApp.$axios.get('/cms/events', {
+      params: { from_date: todayStr, to_date: oneYearLater, all: 1 },
+    });
+
+    const body = response?.data ?? {};
+
+    // Your API returns: { records: { data: [...], current_page: 1, ... } }
+    let data = [];
+    const rec = body.records;
+    if (rec && Array.isArray(rec.data)) {
+      data = rec.data;
+    } else if (Array.isArray(rec)) {
+      data = rec;
+    } else if (Array.isArray(body.data)) {
+      data = body.data;
+    }
+
+    const future = data
+      .filter((e) => {
+        if (!e?.date) return false;
+        const eventStr = nuxtApp.$moment(e.date).format('YYYY-MM-DD');
+        return eventStr >= todayStr;
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    upcomingEvent.value = future.length ? future[0] : null;
+  } catch (error) {
+    console.error('Upcoming event fetch error:', error);
+    upcomingEvent.value = null;
+  }
+};
+// Strip HTML and truncate for announcement excerpt
+const announcementExcerpt = computed(() => {
+  const raw = latestAnnouncement.value?.content;
+  if (!raw || typeof raw !== 'string') return '';
+  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.length > 120 ? text.slice(0, 120) + '…' : text;
+});
+
+// ── Latest announcement (for dashboard card only) ─────────────────────────
 const latestAnnouncement = ref(null);
-const showAnnouncementPopup = ref(false);
-const ANNOUNCEMENT_DISMISSED_KEY = 'dashboard-announcement-dismissed-id';
 
 const fetchLatestAnnouncement = async () => {
   try {
@@ -249,25 +364,15 @@ const fetchLatestAnnouncement = async () => {
       : null;
     if (latest) {
       latestAnnouncement.value = latest;
-      const dismissedId = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(ANNOUNCEMENT_DISMISSED_KEY) : null;
-      if (String(latest.id) !== dismissedId) {
-        showAnnouncementPopup.value = true;
-      }
     }
   } catch (error) {
     console.error('Announcement fetch error:', error);
   }
 };
 
-const onAnnouncementDismiss = () => {
-  showAnnouncementPopup.value = false;
-  if (latestAnnouncement.value?.id && typeof sessionStorage !== 'undefined') {
-    sessionStorage.setItem(ANNOUNCEMENT_DISMISSED_KEY, String(latestAnnouncement.value.id));
-  }
-};
-
 onMounted(() => {
   fetchLatestAnnouncement();
+  fetchUpcomingEvent();
 });
 </script>
 

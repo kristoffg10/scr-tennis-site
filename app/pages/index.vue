@@ -37,7 +37,7 @@
     <!-- Hero content - centered homepage -->
     <section class="relative z-10 w-full max-w-2xl mx-auto text-center flex flex-col items-center gap-8">
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40">
-        <span class="text-[#D4AF37] text-lg">🎾</span>
+        <span class="text-[#D4AF37] text-lg">🔒</span>
         <span class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]">Members Only</span>
       </div>
 

@@ -17,9 +17,9 @@
   
         <!-- ── Header ── -->
         <header class="flex flex-col gap-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]/70">Admin Settings</p>
+          <p class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]/70">User Settings</p>
           <h1 class="text-3xl md:text-4xl font-semibold text-white leading-tight">
-            CMS <span class="text-[#D4AF37]">Editors</span>
+            List of <span class="text-[#D4AF37]">Members</span>
           </h1>
           <p class="text-sm text-white/50 mt-1">Manage user accounts and their assigned roles.</p>
         </header>

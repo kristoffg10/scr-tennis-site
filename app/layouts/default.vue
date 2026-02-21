@@ -191,7 +191,9 @@ const fetchRecords = async () => {
   try {
     const user = authStore.user;
     let userUniques = [];
-    if (user?.role?.permissions) {
+    if (authStore.isSuperAdmin) {
+      userUniques = ['pages-all'];
+    } else if (user?.role?.permissions) {
       try {
         const raw = user.role.permissions;
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -201,9 +203,13 @@ const fetchRecords = async () => {
       }
     }
     const hasAnyPagePermission = () =>
-      userUniques.includes('pages-all') || userUniques.some((u) => u && u.startsWith('pages-'));
+      authStore.isSuperAdmin ||
+      userUniques.includes('pages-all') ||
+      userUniques.some((u) => u && u.startsWith('pages-'));
     const hasPageAccess = (unique) =>
-      userUniques.includes('pages-all') || userUniques.includes(unique);
+      authStore.isSuperAdmin ||
+      userUniques.includes('pages-all') ||
+      userUniques.includes(unique);
 
     const categoriesResponse = await nuxtApp.$axios.get(`/cms/page-categories`);
     const categories = categoriesResponse.data.record || [];

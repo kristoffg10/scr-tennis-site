@@ -1,300 +1,283 @@
 <template>
-    <div class="relative w-full flex flex-col gap-y-[15px] bg-offwhite">
-        <div class="relative w-full flex p-[16px] justify-between items-center bg-white">
-            <form @submit="onSubmit" class="gap-y-[8px] w-full">
-                <label for="search" class="text-base font-medium text-black/70">
-                    Search for a Role
-                </label>
-                <Search v-model="keyword" class="w-full"/>
-            </form>
-            <!-- <div class="gap-y-[8px] w-[143px]">
-                <label for="filter" class="text-base font-medium text-black/70">
-                    Filter by Location
-                </label>
-                <Filter v-if="locations" :options="locations" :placeholder="'Choose a Location'" :filterBy="'Location'"/>
-            </div> -->
+  <div
+    class="min-h-screen w-full relative bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] overflow-y-auto overflow-x-hidden pt-[220px] pb-16"
+  >
+    <div
+      class="pointer-events-none absolute inset-0 opacity-[0.03]"
+      style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"
+      aria-hidden="true"
+    />
+    <div class="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9A227]/10 rounded-full blur-3xl" aria-hidden="true" />
+    <div class="pointer-events-none absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C9A227]/5 rounded-full blur-3xl" aria-hidden="true" />
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 lg:px-8 flex flex-col gap-8">
+      <header class="flex flex-col gap-1">
+        <p class="text-xs font-semibold tracking-widest uppercase text-[#D4AF37]/70">Admin Settings</p>
+        <h1 class="text-3xl md:text-4xl font-semibold text-white leading-tight">
+          <span class="text-[#D4AF37]">Roles</span>
+        </h1>
+        <p class="text-sm text-white/50 mt-1">Manage roles and their permissions.</p>
+      </header>
+
+      <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="flex-1 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#D4AF37]/50 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+            </svg>
+          </span>
+          <input
+            v-model="keyword"
+            type="text"
+            placeholder="Search for a role…"
+            class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/5 border border-[#C9A227]/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#C9A227]/60 focus:bg-white/10 transition-all"
+          />
         </div>
-        
-        <div class="p-[16px] gap-y-[20px] overflow-y-auto  gap-[16px] flex flex-col">
-            <div class="flex justify-between items-center w-full">
-                <p v-if="roles && roles.data" class="text-black font-medium text-base">
-                    <span class="text-black/60">Displaying </span> 
-                    {{ roles.total > 0 ? roles.from : 0 }} {{ roles.total > 0 ? ' - ' +  roles.to : '' }} 
-                    <span class="text-black/60">of</span> 
-                    {{ roles.total }} 
-                    <span class="text-black/60">items</span>
-                </p>
-                <div class="flex gap-[16px] items-center">
-                    <!-- <button type="button" class="px-[16px] py-[10px] rounded-[10px] border border-ui-color text-ui-color text-base font-medium transition
-                    hover:bg-dark-ui-color hover:text-white">
-                        Batch Import    
-                    </button> -->
-                    <router-link  :to="`/admin-settings/roles/create`" class="px-[16px] py-[10px] rounded-[10px] bg-ui-color border border-ui-color text-white text-base font-medium transition
-                    hover:bg-dark-ui-color flex gap-[4px]">
-                    <span class="w-[21px] h-[21px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="none">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5 19.6875C5.42587 19.6875 1.3125 15.5728 1.3125 10.5C1.3125 5.42719 5.42587 1.3125 10.5 1.3125C15.5741 1.3125 19.6875 5.42719 19.6875 10.5C19.6875 15.5728 15.5741 19.6875 10.5 19.6875ZM10.5 0C4.70072 0 0 4.69875 0 10.5C0 16.3012 4.70072 21 10.5 21C16.2993 21 21 16.3012 21 10.5C21 4.69875 16.2993 0 10.5 0ZM14.4375 9.84375H11.1562V6.5625C11.1562 6.20156 10.8629 5.90625 10.5 5.90625C10.1371 5.90625 9.84375 6.20156 9.84375 6.5625V9.84375H6.5625C6.19959 9.84375 5.90625 10.1391 5.90625 10.5C5.90625 10.8609 6.19959 11.1562 6.5625 11.1562H9.84375V14.4375C9.84375 14.7984 10.1371 15.0938 10.5 15.0938C10.8629 15.0938 11.1562 14.7984 11.1562 14.4375V11.1562H14.4375C14.8004 11.1562 15.0938 10.8609 15.0938 10.5C15.0938 10.1391 14.8004 9.84375 14.4375 9.84375Z" fill="#FCFCFC"/>
-                        </svg>
-                    </span>
-                        Add a New Role
-                    </router-link>
+        <div class="flex items-center gap-4 shrink-0">
+          <p v-if="roles && roles.data" class="text-xs text-white/40 hidden sm:block">
+            <span class="font-medium text-white/70">{{ roles.total > 0 ? roles.from : 0 }}–{{ roles.total > 0 ? roles.to : 0 }}</span>
+            of
+            <span class="font-medium text-white/70">{{ roles.total ?? 0 }}</span>
+          </p>
+          <router-link
+            to="/admin-settings/roles/create"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add a New Role
+          </router-link>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
+        <div v-if="roles && roles.data && roles.data.length" class="md:hidden divide-y divide-white/5">
+          <div
+            v-for="role in roles.data"
+            :key="role.id"
+            class="px-4 sm:px-6 py-4 flex flex-col gap-3 hover:bg-white/5 transition-colors"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                  </svg>
                 </div>
+                <div>
+                  <p class="text-sm font-semibold text-white/90">{{ role.name }}</p>
+                  <p class="text-xs text-white/40 mt-0.5">{{ role.users_count ?? 0 }} {{ (role.users_count ?? 0) === 1 ? 'User' : 'Users' }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <router-link
+                  :to="`/admin-settings/roles/${role.id}`"
+                  class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 transition-all"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8477 1.87868C19.6761 0.707109 17.7766 0.707105 16.605 1.87868L2.44744 16.0363C2.02864 16.4551 1.74317 16.9885 1.62702 17.5692L1.03995 20.5046C0.760062 21.904 1.9939 23.1379 3.39334 22.858L6.32868 22.2709C6.90945 22.1548 7.44285 21.8693 7.86165 21.4505L22.0192 7.29289C23.1908 6.12132 23.1908 4.22183 22.0192 3.05025L20.8477 1.87868ZM18.0192 3.29289C18.4098 2.90237 19.0429 2.90237 19.4335 3.29289L20.605 4.46447C20.9956 4.85499 20.9956 5.48815 20.605 5.87868L17.9334 8.55027L15.3477 5.96448L18.0192 3.29289ZM3.86165 17.4505L13.9334 7.3787L16.5192 9.96448L6.44744 20.0363C6.30784 20.1759 6.13004 20.271 5.93645 20.3097L3.00111 20.8968L3.86165 17.4505Z" fill="currentColor"/>
+                  </svg>
+                </router-link>
+                <button
+                  type="button"
+                  class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  :disabled="isDeleteDisabled(role)"
+                  @click="!isDeleteDisabled(role) && openDeletePopup(`/cms/roles/${role.id}`)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 23" fill="none">
+                    <path d="M7.78 17.78a1.11 1.11 0 001.57 0 1.11 1.11 0 000-1.57V10a1.1 1.1 0 00-1.57-1.56 1.11 1.11 0 000 1.57v6.67zm11.11-13.33h-4.44V3.33a2.22 2.22 0 00-2.22-2.22H8.89a2.22 2.22 0 00-2.22 2.22v1.11H1.11a1.11 1.11 0 000 2.22h1.11v12.22A2.22 2.22 0 005.56 21h10a2.22 2.22 0 002.22-2.22V6.67h1.11a1.11 1.11 0 100-2.22zM7.78 3.33V4.44h5.55V3.33a.56.56 0 00-.55-.55H8.33a.56.56 0 00-.55.55zm7.78 15.56H5.56V6.67h11.11v12.22z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <table class="min-w-full border-collapse rounded-[10px] overflow-hidden bg-off-white border-separate border-spacing-0 relative z-10 pb-[140px]">
-                <thead>
-                    <tr class="h-[40px] bg-white text-black/60 font-medium text-base text-left">
-                        
-                        <th class="px-[24px] py-[8px]">Role Name</th>
-                        <th class="px-[24px] py-[8px]">Used by</th>
-                        <th class="px-[24px] py-[8px] flex gap-[8px] cursor-pointer"  @click="toggleSort('date')">
-                            Last Edited
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="18"
-                                height="18"
-                                viewBox="0 0 18 18"
-                                fill="none">
-                                <!-- Upward triangle -->
-                                <path
-                                    d="M5.22216 7.34717L8.57972 3.1633C8.87841 2.7763 9.37059 2.7763 9.66985 3.1633L13.0274 7.34717C13.3261 7.73417 13.1855 8.0503 12.6758 8.0503H5.57428C5.06466 8.0503 4.92403 7.73361 5.22272 7.34717H5.22216Z"
-                                    :fill="
-                                        sortBy === 'updated_at' &&
-                                        sortDirection === 'asc'
-                                            ? '#4B545B'
-                                            : '#A6A8AB'
-                                    " />
-                                <!-- Downward triangle -->
-                                <path
-                                    d="M13.0268 10.6519L9.66928 14.8357C9.3706 15.2227 8.87841 15.2227 8.57916 14.8357L5.2216 10.6519C4.92291 10.2649 5.06353 9.94873 5.57316 9.94873H12.6747C13.1843 9.94873 13.325 10.2654 13.0263 10.6519H13.0268Z"
-                                    :fill="
-                                        sortBy === 'updated_at' &&
-                                        sortDirection === 'desc'
-                                            ? '#4B545B'
-                                            : '#A6A8AB'
-                                    " />
-                            </svg>
-                        </th>
-                        
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-if="roles && roles.data" v-for="(role, index) in roles.data" :key="role.id">
-                        <tr class="h-3"> <!-- Adjust the height as needed -->
-                            <td colspan="5"></td> <!-- Empty cell to occupy space -->
-                        </tr>
-                        <tr class="bg-white text-black font-normal text-base text-left font-light">
-                            <td class="px-[24px] py-[12px] text-base font-semibold align-top">{{ role.name }}</td>
-                            <td class="px-[24px] py-[12px] align-top">
-                                <span>{{ role.users_count ?? 0 }} {{ (role.users_count ?? 0) === 1 ? 'User' : 'Users' }}</span>
-                            </td>
-                            <td class="px-[24px] py-[8px] ">
-                                {{ $moment(role.updated_at).format('MMM DD, YYYY') }}<br>
-                                <span class="text-sm text-black">
-                                    {{ $moment(role.updated_at).format('hh:mm A') }}
-                                </span>
-                            </td>
-                            <td class="px-[24px] py-[8px] relative w-[150px]">
-                                <div class="flex items-center gap-[8px]">
-                                    <router-link
-                                        :to="`/admin-settings/roles/${role.id}`"
-                                        class="inline-flex items-center justify-center w-[32px] h-[32px] rounded-full bg-ui-hover text-ui-color hover:bg-ui-color hover:text-white transition-colors"
-                                        :title="`Edit ${role.name}`">
-                                        <svg
-                                            width="18"
-                                            height="18"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M20.8477 1.87868C19.6761 0.707109 17.7766 0.707105 16.605 1.87868L2.44744 16.0363C2.02864 16.4551 1.74317 16.9885 1.62702 17.5692L1.03995 20.5046C0.760062 21.904 1.9939 23.1379 3.39334 22.858L6.32868 22.2709C6.90945 22.1548 7.44285 21.8693 7.86165 21.4505L22.0192 7.29289C23.1908 6.12132 23.1908 4.22183 22.0192 3.05025L20.8477 1.87868ZM18.0192 3.29289C18.4098 2.90237 19.0429 2.90237 19.4335 3.29289L20.605 4.46447C20.9956 4.85499 20.9956 5.48815 20.605 5.87868L17.9334 8.55027L15.3477 5.96448L18.0192 3.29289ZM3.86165 17.4505L13.9334 7.3787L16.5192 9.96448L6.44744 20.0363C6.30784 20.1759 6.13004 20.271 5.93645 20.3097L3.00111 20.8968L3.86165 17.4505Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </router-link>
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center justify-center w-[32px] h-[32px] rounded-full transition-colors"
-                                        :class="isDeleteDisabled(role)
-                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                                            : 'bg-danger/10 text-danger hover:bg-danger hover:text-white'"
-                                        :disabled="isDeleteDisabled(role)"
-                                        :title="isDeleteDisabled(role) ? (getDeleteDisabledReason(role)) : `Delete ${role.name}`"
-                                        @click="!isDeleteDisabled(role) && openDeletePopup(`/cms/roles/${role.id}`)">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="18"
-                                            height="20"
-                                            viewBox="0 0 20 23"
-                                            fill="none">
-                                            <path
-                                                d="M7.77778 17.7778C8.07246 17.7778 8.35508 17.6607 8.56345 17.4523C8.77183 17.244 8.88889 16.9614 8.88889 16.6667V10C8.88889 9.70531 8.77183 9.4227 8.56345 9.21433C8.35508 9.00595 8.07246 8.88889 7.77778 8.88889C7.48309 8.88889 7.20048 9.00595 6.9921 9.21433C6.78373 9.4227 6.66667 9.70531 6.66667 10V16.6667C6.66667 16.9614 6.78373 17.244 6.9921 17.4523C7.20048 17.6607 7.48309 17.7778 7.77778 17.7778ZM18.8889 4.44444H14.4444V3.33333C14.4444 2.44928 14.0933 1.60143 13.4681 0.976311C12.843 0.35119 11.9952 0 11.1111 0H8.88889C8.00483 0 7.15699 0.35119 6.53187 0.976311C5.90674 1.60143 5.55556 2.44928 5.55556 3.33333V4.44444H1.11111C0.816426 4.44444 0.533811 4.56151 0.325437 4.76988C0.117063 4.97825 0 5.26087 0 5.55556C0 5.85024 0.117063 6.13286 0.325437 6.34123C0.533811 6.5496 0.816426 6.66667 1.11111 6.66667H2.22222V18.8889C2.22222 19.7729 2.57341 20.6208 3.19853 21.2459C3.82365 21.871 4.6715 22.2222 5.55556 22.2222H14.4444C15.3285 22.2222 16.1763 21.871 16.8015 21.2459C17.4266 20.6208 17.7778 19.7729 17.7778 18.8889V6.66667H18.8889C19.1836 6.66667 19.4662 6.5496 19.6746 6.34123C19.8829 6.13286 20 5.85024 20 5.55556C20 5.26087 19.8829 4.97825 19.6746 4.76988C19.4662 4.56151 19.1836 4.44444 18.8889 4.44444ZM7.77778 3.33333C7.77778 3.03865 7.89484 2.75603 8.10322 2.54766C8.31159 2.33929 8.5942 2.22222 8.88889 2.22222H11.1111C11.4058 2.22222 11.6884 2.33929 11.8968 2.54766C12.1052 2.75603 12.2222 3.03865 12.2222 3.33333V4.44444H7.77778V3.33333ZM15.5556 18.8889C15.5556 19.1836 15.4385 19.4662 15.2301 19.6746C15.0217 19.8829 14.7391 20 14.4444 20H5.55556C5.26087 20 4.97826 19.8829 4.76988 19.6746C4.56151 19.4662 4.44444 19.1836 4.44444 18.8889V6.66667H15.5556V18.8889ZM12.2222 17.7778C12.5169 17.7778 12.7995 17.6607 13.0079 17.4523C13.2163 17.244 13.3333 16.9614 13.3333 16.6667V10C13.3333 9.70531 13.2163 9.4227 13.0079 9.21433C12.7995 9.00595 12.5169 8.88889 12.2222 8.88889C11.9275 8.88889 11.6449 9.00595 11.4365 9.21433C11.2282 9.4227 11.1111 9.70531 11.1111 10V16.6667C11.1111 16.9614 11.2282 17.244 11.4365 17.4523C11.6449 17.6607 11.9275 17.7778 12.2222 17.7778Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table> 
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <span class="text-white/35">Edited {{ $moment(role.updated_at).format('MMM DD, YYYY · hh:mm A') }}</span>
+            </div>
+          </div>
         </div>
+
+        <div class="hidden md:block overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white/35">Role Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white/35">Used by</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white/35 cursor-pointer" @click="toggleSort('date')">
+                  <span class="inline-flex items-center gap-1.5">
+                    Last Edited
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 18 18" fill="none" class="text-white/35">
+                      <path d="M5.22 7.35L8.58 3.16C8.88 2.78 9.37 2.78 9.67 3.16L13.03 7.35C13.33 7.73 13.19 8.05 12.68 8.05H5.57C5.06 8.05 4.92 7.73 5.22 7.35Z" :fill="sortBy === 'updated_at' && sortDirection === 'asc' ? '#D4AF37' : 'currentColor'"/>
+                      <path d="M13.03 10.65L9.67 14.84C9.37 15.22 8.88 15.22 8.58 14.84L5.22 10.65C4.92 10.27 5.06 9.95 5.57 9.95H12.68C13.19 9.95 13.33 10.27 13.03 10.65Z" :fill="sortBy === 'updated_at' && sortDirection === 'desc' ? '#D4AF37' : 'currentColor'"/>
+                    </svg>
+                  </span>
+                </th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-white/35">Actions</th>
+              </tr>
+            </thead>
+            <tbody v-if="roles && roles.data && roles.data.length">
+              <tr
+                v-for="role in roles.data"
+                :key="role.id"
+                class="border-b border-white/5 hover:bg-white/5 transition-colors"
+              >
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                      </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-white/90">{{ role.name }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-white/55">{{ role.users_count ?? 0 }} {{ (role.users_count ?? 0) === 1 ? 'User' : 'Users' }}</td>
+                <td class="px-6 py-4 text-xs text-white/55 leading-relaxed">
+                  {{ $moment(role.updated_at).format('MMM DD, YYYY') }}<br />
+                  <span class="text-white/35">{{ $moment(role.updated_at).format('hh:mm A') }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-2">
+                    <router-link
+                      :to="`/admin-settings/roles/${role.id}`"
+                      class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 hover:border-[#C9A227]/50 transition-all"
+                      :title="`Edit ${role.name}`"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8477 1.87868C19.6761 0.707109 17.7766 0.707105 16.605 1.87868L2.44744 16.0363C2.02864 16.4551 1.74317 16.9885 1.62702 17.5692L1.03995 20.5046C0.760062 21.904 1.9939 23.1379 3.39334 22.858L6.32868 22.2709C6.90945 22.1548 7.44285 21.8693 7.86165 21.4505L22.0192 7.29289C23.1908 6.12132 23.1908 4.22183 22.0192 3.05025L20.8477 1.87868ZM18.0192 3.29289C18.4098 2.90237 19.0429 2.90237 19.4335 3.29289L20.605 4.46447C20.9956 4.85499 20.9956 5.48815 20.605 5.87868L17.9334 8.55027L15.3477 5.96448L18.0192 3.29289ZM3.86165 17.4505L13.9334 7.3787L16.5192 9.96448L6.44744 20.0363C6.30784 20.1759 6.13004 20.271 5.93645 20.3097L3.00111 20.8968L3.86165 17.4505Z" fill="currentColor"/>
+                      </svg>
+                    </router-link>
+                    <button
+                      type="button"
+                      class="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                      :class="isDeleteDisabled(role)
+                        ? 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                        : 'bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/25 hover:border-red-400/40'"
+                      :disabled="isDeleteDisabled(role)"
+                      :title="isDeleteDisabled(role) ? getDeleteDisabledReason(role) : `Delete ${role.name}`"
+                      @click="!isDeleteDisabled(role) && openDeletePopup(`/cms/roles/${role.id}`)"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 23" fill="none">
+                        <path d="M7.78 17.78a1.11 1.11 0 001.57 0 1.11 1.11 0 000-1.57V10a1.1 1.1 0 00-1.57-1.56 1.11 1.11 0 000 1.57v6.67zm11.11-13.33h-4.44V3.33a2.22 2.22 0 00-2.22-2.22H8.89a2.22 2.22 0 00-2.22 2.22v1.11H1.11a1.11 1.11 0 000 2.22h1.11v12.22A2.22 2.22 0 005.56 21h10a2.22 2.22 0 002.22-2.22V6.67h1.11a1.11 1.11 0 100-2.22zM7.78 3.33V4.44h5.55V3.33a.56.56 0 00-.55-.55H8.33a.56.56 0 00-.55.55zm7.78 15.56H5.56V6.67h11.11v12.22z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="!roles?.data?.length" class="px-6 py-16 text-center">
+          <div class="w-14 h-14 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/20 flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="text-[#D4AF37]/50">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+            </svg>
+          </div>
+          <p class="text-white/30 text-sm">No roles found.</p>
+        </div>
+      </div>
+
+      <div class="mx-auto w-full">
+        <Pagination />
+      </div>
     </div>
-    
+
     <PopupDelete
-        v-model:show="showDeletePopup"
-        :deletePath="deletePath"
-        @delete-success="fetchRecords(1)" />
-    
-    <Pagination />
-</template>
+      v-model:show="showDeletePopup"
+      :deletePath="deletePath"
+      @delete-success="fetchRecords(1)"
+    />
+  </div>
+  </template>
+
 <script setup>
-    import { usePageTitleStore } from '~/stores/pageTitle';
-    import { usePaginationStore } from '~/stores/pagination';
-    import { useFilterStore } from '~/stores/filters';
-    import { useSidebarStore } from '~/stores/sidebar';
-    import { useRoute } from 'vue-router';
-    import { useAsyncData } from 'nuxt/app'
+import { usePageTitleStore } from '~/stores/pageTitle';
+import { usePaginationStore } from '~/stores/pagination';
 
-    definePageMeta({
-        middleware: 'authenticator'
-    })
+definePageMeta({ middleware: 'authenticator' });
 
-    const pageTitle = usePageTitleStore();
-    const pagination = usePaginationStore();
-    const filter = useFilterStore();
-    const sidebar = useSidebarStore();
-    const route = useRoute();
+const PopupDelete = defineAsyncComponent(() => import('~/components/popup/delete.vue'));
+const Pagination = defineAsyncComponent(() => import('@/components/Pagination.vue'));
 
-    
-    const formattedTitle = ref('');
-    const secondLastSegment = ref('');
-    
-    const nuxtApp = useNuxtApp();
-    const roles = ref(null);
+const pageTitle = usePageTitleStore();
+const pagination = usePaginationStore();
+const nuxtApp = useNuxtApp();
+const roles = ref(null);
+const keyword = ref('');
+const showDeletePopup = ref(false);
+const deletePath = ref('');
+const sortBy = ref('updated_at');
+const sortDirection = ref('desc');
 
-    onMounted( () => {
-        
-        fetchRecords();
-        // const currentPath = route.path; // Get the current path
-        // const pathSegments = route.path.split('/'); 
+const PRIMARY_ROLE_IDS = [
+  'fa5e772f-5715-4dea-9922-351e8e27bdab',
+  'f269b653-5ef6-4fed-aa4b-1e1c81bdbc99',
+];
 
-        // const firstPathSegment = currentPath.split('/')[1]; // Split by '/' and get the first segment after the base
-        
-        // if (pathSegments.length > 2) {
-        //     secondLastSegment.value = pathSegments[pathSegments.length - 2];
-        // }
+const reorderRolesWithPriority = (records) => {
+  if (!records || !Array.isArray(records.data)) return records;
+  const priorityIndex = new Map(PRIMARY_ROLE_IDS.map((id, idx) => [id, idx]));
+  const reordered = [...records.data].sort((a, b) => {
+    const pa = priorityIndex.has(a.id) ? priorityIndex.get(a.id) : -1;
+    const pb = priorityIndex.has(b.id) ? priorityIndex.get(b.id) : -1;
+    if (pa === -1 && pb === -1) return 0;
+    if (pa === -1) return 1;
+    if (pb === -1) return -1;
+    return pa - pb;
+  });
+  return { ...records, data: reordered };
+};
 
-        // formattedTitle.value = secondLastSegment.value
-        //     .replace(/-/g, ' ') // Replace dashes with spaces
-        //     .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize the first letter of each word
+const fetchRecords = async () => {
+  try {
+    const user_response = await nuxtApp.$axios.get(`/cms/roles?page=${pagination.page}&sortBy=${sortBy.value}&sortDirection=${sortDirection.value}&keyword=${keyword.value}`);
+    const records = user_response.data.records;
+    roles.value = reorderRolesWithPriority(records);
+    pagination.setTotalPages(roles.value?.last_page ?? 1);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
 
+const toggleSort = async (column) => {
+  if (sortBy.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = column;
+    sortDirection.value = 'asc';
+  }
+  await fetchRecords();
+};
 
-        // console.log(formattedTitle); // Output: 'Featured House & Lots'
-        // const property_type = propertyType.replace(/-/g, ' ') // Replace dashes with spaces
-        //     .replace(/\band\b/gi, '&') // Replace 'and' with '&'
-        //     .replace(/\b\w/g, char => char.toUpperCase());
+const PROTECTED_ROLE_IDS = [...PRIMARY_ROLE_IDS];
+const isDeleteDisabled = (role) => {
+  if (!role) return true;
+  if (PROTECTED_ROLE_IDS.includes(role.id)) return true;
+  return (role.users_count ?? 0) >= 1;
+};
+const getDeleteDisabledReason = (role) => {
+  if (!role) return 'This role cannot be deleted';
+  if (PROTECTED_ROLE_IDS.includes(role.id)) return 'This role cannot be deleted';
+  const n = role.users_count ?? 0;
+  if (n >= 1) return `Cannot delete: ${n} user(s) assigned to this role`;
+  return 'This role cannot be deleted';
+};
 
-        pagination.reset();
-        pageTitle.setTitle(`Roles`);
-        pageTitle.setBreadcrumbs(['Admin Settings', 'Roles']);
+const openDeletePopup = (url) => {
+  showDeletePopup.value = true;
+  deletePath.value = url;
+};
 
-        // pageTitle.setPageFrom('Communities');
-        // pageTitle.setPageFromRoute('/properties/' + propertyType);
-        // populateData(sectionData.value);
-    });
+onMounted(() => {
+  pagination.reset();
+  fetchRecords();
+  pageTitle.setTitle('Roles');
+  pageTitle.setBreadcrumbs(['Admin Settings', 'Roles']);
+  pageTitle.setPageFrom('');
+  pageTitle.setPageFromRoute('');
+});
 
-    const PRIMARY_ROLE_IDS = [
-        // Always show these IDs at the very top, in this order
-        'fa5e772f-5715-4dea-9922-351e8e27bdab',
-        'f269b653-5ef6-4fed-aa4b-1e1c81bdbc99',
-    ];
-
-    const reorderRolesWithPriority = (records) => {
-        if (!records || !Array.isArray(records.data)) return records;
-
-        const priorityIndex = new Map(
-            PRIMARY_ROLE_IDS.map((id, idx) => [id, idx])
-        );
-
-        const reordered = [...records.data].sort((a, b) => {
-            const pa = priorityIndex.has(a.id) ? priorityIndex.get(a.id) : -1;
-            const pb = priorityIndex.has(b.id) ? priorityIndex.get(b.id) : -1;
-
-            // If neither role is priority, keep existing relative order
-            if (pa === -1 && pb === -1) return 0;
-            // Priority roles always come first
-            if (pa === -1) return 1;
-            if (pb === -1) return -1;
-            // Both are priority: respect configured order
-            return pa - pb;
-        });
-
-        return {
-            ...records,
-            data: reordered,
-        };
-    };
-
-    const fetchRecords = async () => {
-        try {
-            const user_response = await nuxtApp.$axios.get(`/cms/roles?page=${pagination.page}
-            &sortBy=${sortBy.value}
-            &sortDirection=${sortDirection.value}
-            &keyword=${keyword.value}`); 
-
-            const records = user_response.data.records;
-            roles.value = reorderRolesWithPriority(records);
-            pagination.setTotalPages(roles.value.last_page)
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    
-    const sortBy = ref('updated_at');
-    const sortDirection = ref('desc');
-
-    const toggleSort = async column => {
-        if (sortBy.value === column) {
-            sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortBy.value = column;
-            sortDirection.value = 'asc';
-        }
-
-        await fetchRecords();
-    };
-
-    
-    const showPopup = ref(false);
-    const showDeletePopup = ref(false);
-    const deletePath = ref('');
-
-    const PROTECTED_ROLE_IDS = [...PRIMARY_ROLE_IDS];
-    const isDeleteDisabled = (role) => {
-        if (!role) return true;
-        if (PROTECTED_ROLE_IDS.includes(role.id)) return true;
-        return (role.users_count ?? 0) >= 1;
-    };
-    const getDeleteDisabledReason = (role) => {
-        if (!role) return 'This role cannot be deleted';
-        if (PROTECTED_ROLE_IDS.includes(role.id)) return 'This role cannot be deleted';
-        const n = role.users_count ?? 0;
-        if (n >= 1) return `Cannot delete: ${n} user(s) assigned to this role`;
-        return 'This role cannot be deleted';
-    };
-
-    const openDeletePopup = (url) => {
-        showDeletePopup.value = true;
-        deletePath.value = url;
-    };
-
-    const keyword = ref('');
-
-    watch(keyword, () => {
-        console.log(keyword.value);
-        fetchRecords();
-    });
+watch(keyword, () => { pagination.reset(); fetchRecords(); });
+watch(() => pagination.page, () => fetchRecords());
 </script>

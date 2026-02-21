@@ -1,6 +1,6 @@
 // middleware/authenticator.js
 import { defineNuxtRouteMiddleware, useAuth } from '#imports'
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore, SUPER_ADMIN_USER_ID } from '~/stores/auth'
 import { usePermissionStore } from '~/stores/permissions'
 
 const ALLOW_WITHOUT_CHECK = ['login', 'index', 'dashboard']
@@ -25,7 +25,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         authStore.setUser(session.user)
 
         // Route-level permission check: redirect to dashboard if user's role cannot access this route
+        // Super admin user is exempt from all role restrictions
         const user = authStore.user
+        if (user?.id === SUPER_ADMIN_USER_ID) {
+          return
+        }
         if (user?.role?.permissions) {
           const routeName = to.name || to.path.replace(/^\//, '').replace(/\//g, '-') || ''
           if (routeName && !ALLOW_WITHOUT_CHECK.includes(routeName)) {
