@@ -164,6 +164,16 @@
               </Transition>
           </div>
           <div @click="toggled()" class="flex justify-center gap-x-[8px] items-center py-[6px] px-[14px] relative cursor-pointer rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 transition-colors" :class="{'bg-[#C9A227]/20 border-[#C9A227]/40' : isToggled}">
+              <!-- Profile image or initials -->
+              <div v-if="displayUser" class="w-8 h-8 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] text-sm font-semibold shrink-0 overflow-hidden">
+                <img
+                  v-if="profileImageUrl"
+                  :src="profileImageUrl"
+                  :alt="displayUser?.user_detail?.full_name ?? displayUser?.email ?? 'User'"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else>{{ userInitials }}</span>
+              </div>
               <h1 v-if="displayUser" class="text-base font-medium text-white" :class="{'text-[#D4AF37]' : isToggled}">{{ displayUser?.user_detail?.full_name ?? displayUser?.email ?? 'User' }}</h1>
               <p v-else class="text-sm text-white/60">Loading user data...</p>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[#D4AF37] transition-transform duration-200" :class="{'rotate-180' : isToggled}">
@@ -280,6 +290,20 @@ const user = ref(null);
 const authStore = useAuthStore();
 
 const displayUser = computed(() => authStore.user || user.value);
+
+const profileImageUrl = computed(() => {
+  const data = displayUser.value;
+  if (!data?.images?.length) return null;
+  const img = data.images.find((i) => i?.category === 'profile_image');
+  return img?.url ?? img?.path ?? img?.src ?? null;
+});
+
+const userInitials = computed(() => {
+  const u = displayUser.value;
+  if (!u) return '?';
+  const name = u?.user_detail?.full_name || u?.email || '';
+  return name.split(/[\s@]+/).slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('') || '?';
+});
 
 onMounted(async () => {
   updateTime();

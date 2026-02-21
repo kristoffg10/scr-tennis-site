@@ -18,7 +18,6 @@
           <h1 class="text-3xl md:text-4xl font-semibold text-white leading-tight">
             View <span class="text-[#D4AF37]">Event</span>
           </h1>
-          <p class="text-sm text-white/50 mt-1">Event details (read-only).</p>
         </div>
         <div class="shrink-0 mt-1 flex items-center gap-2">
           <span v-if="eventData?.event_type" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#C9A227]/15 text-[#D4AF37] border border-[#C9A227]/25 capitalize">
@@ -59,7 +58,6 @@
             </div>
             <div>
               <h2 class="text-base font-semibold text-white">Event Information</h2>
-              <p class="text-xs text-white/40">Title, date, location, and description</p>
             </div>
           </div>
           <div class="p-6 flex flex-col gap-5">

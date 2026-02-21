@@ -19,8 +19,13 @@
         <p class="text-sm text-white/45">Update your membership details and credentials.</p>
       </header>
 
+      <!-- Access denied: this user can only be edited by themselves -->
+      <div v-if="!canAccessThisEditor" class="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-8 py-10 text-center text-amber-200 text-sm">
+        You can only edit your own profile for this account. Redirecting…
+      </div>
+
       <!-- Loading state -->
-      <div v-if="loading" class="rounded-2xl border border-[#C9A227]/20 bg-white/5 px-8 py-10 text-center text-white/50 text-sm">
+      <div v-else-if="loading" class="rounded-2xl border border-[#C9A227]/20 bg-white/5 px-8 py-10 text-center text-white/50 text-sm">
         Loading member data…
       </div>
 
@@ -172,7 +177,7 @@
 import { useAuthStore } from '~/stores/auth';
 import { usePageTitleStore } from '~/stores/pageTitle';
 import { Form } from 'vee-validate';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 definePageMeta({ middleware: 'authenticator' });
 
@@ -181,7 +186,16 @@ const ImageHandler = defineAsyncComponent(() => import('@/components/form-fields
 const nuxtApp = useNuxtApp();
 const authStore = useAuthStore();
 const route = useRoute();
+const router = useRouter();
 const pageTitle = usePageTitleStore();
+
+// This user may only be edited by themselves (same user).
+const PROTECTED_EDITOR_ID = '59ce9e0c-f1e9-4eee-a840-2a17b68dbc10';
+const canAccessThisEditor = computed(() => {
+  const profileId = route.params.id;
+  if (profileId !== PROTECTED_EDITOR_ID) return true;
+  return authStore.user?.id === PROTECTED_EDITOR_ID;
+});
 
 const ALLOWED_ROLE_IDS_FOR_CHANGE_ROLE = [
   'f269b653-5ef6-4fed-aa4b-1e1c81bdbc99',
@@ -250,6 +264,11 @@ const fetchRecords = async () => {
 };
 
 onMounted(() => {
+  if (!canAccessThisEditor.value) {
+    nuxtApp.$toast.error('You can only edit your own profile for this account.');
+    router.replace('/admin-settings/cms-editors');
+    return;
+  }
   pageTitle.setTitle('Edit User');
   pageTitle.setBreadcrumbs(['Admin Settings', 'Users', 'Edit User']);
   pageTitle.setPageFrom('Users List');

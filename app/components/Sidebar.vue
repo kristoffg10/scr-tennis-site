@@ -127,6 +127,12 @@ const sidebarNavItems = computed(() => {
       link: '/dashboard',
     },
     {
+      name: 'Announcements',
+      emoji: '📢',
+      description: 'Stay up-to-date on club news and notices.',
+      link: '/announcements',
+    },
+    {
       name: 'Schedules',
       emoji: '📅',
       description: 'View upcoming matches and reservations.',
@@ -143,12 +149,6 @@ const sidebarNavItems = computed(() => {
       emoji: '👥',
       description: 'Find and connect with fellow club members.',
       link: '/admin-settings/cms-editors',
-    },
-    {
-      name: 'Announcements',
-      emoji: '📢',
-      description: 'Stay up-to-date on club news and notices.',
-      link: '/announcements',
     },
     {
       name: 'Roles',
