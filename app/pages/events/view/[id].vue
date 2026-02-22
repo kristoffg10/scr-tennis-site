@@ -91,6 +91,53 @@
           </div>
         </div>
 
+        <!-- Match Result / Score (only if any score data set) -->
+        <div
+          v-if="hasScoreData"
+          class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden"
+        >
+          <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
+          <div class="px-6 py-5 border-b border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-white">Match Result</h2>
+              <p class="text-xs text-white/40">Final score and winner</p>
+            </div>
+          </div>
+          <div class="p-6 flex flex-col gap-5">
+            <template v-if="(eventData.match_type === 'doubles' || eventData.match_type === 'mixed') && (eventData.team_one_label || eventData.team_two_label)">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div v-if="eventData.team_one_label" class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-white/50">Team / Pair 1</span>
+                  <p class="text-sm text-white/90">{{ eventData.team_one_label }}</p>
+                </div>
+                <div v-if="eventData.team_two_label" class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-white/50">Team / Pair 2</span>
+                  <p class="text-sm text-white/90">{{ eventData.team_two_label }}</p>
+                </div>
+              </div>
+            </template>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div v-if="eventData.final_score" class="flex flex-col gap-1.5">
+                <span class="text-xs font-semibold uppercase tracking-wider text-white/50">Final Score</span>
+                <p class="text-lg font-semibold text-[#D4AF37]">{{ eventData.final_score }}</p>
+              </div>
+              <div v-if="eventData.winner_name" class="flex flex-col gap-1.5">
+                <span class="text-xs font-semibold uppercase tracking-wider text-white/50">Winner</span>
+                <p class="text-sm font-medium text-white/90">{{ eventData.winner_name }}</p>
+              </div>
+            </div>
+            <div v-if="eventData.match_notes" class="flex flex-col gap-1.5">
+              <span class="text-xs font-semibold uppercase tracking-wider text-white/50">Match Notes</span>
+              <p class="text-sm text-white/80">{{ eventData.match_notes }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Tennis-Specific Fields (only if any set) -->
         <div
           v-if="eventData.match_type || eventData.format || eventData.scoring_format || eventData.assigned_coach"
@@ -268,6 +315,12 @@ const currentLightboxImage = computed(() => {
   const idx = lightboxIndex.value;
   if (!list.length || idx < 0 || idx >= list.length) return null;
   return list[idx];
+});
+
+const hasScoreData = computed(() => {
+  const d = eventData.value;
+  if (!d) return false;
+  return !!(d.final_score || d.winner_name || d.match_notes || d.team_one_label || d.team_two_label);
 });
 
 function openLightbox(index) {

@@ -202,6 +202,186 @@
           </div>
         </div>
 
+        <!-- ── Match result / Score Card (tennis) ── -->
+        <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
+          <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
+          <div class="px-6 py-5 border-b border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-white">Match Result / Score</h2>
+              <p class="text-xs text-white/40">Log the final score and winner (for completed matches)</p>
+            </div>
+          </div>
+          <div class="p-6 flex flex-col gap-5">
+            <!-- Singles: Player 1 vs Player 2, Winner = one of them -->
+            <template v-if="formData.match_type === 'singles'">
+              <p v-if="formData.team_one_label || formData.team_two_label" class="text-xs text-white/40">Current: {{ formData.team_one_label || '—' }} vs {{ formData.team_two_label || '—' }}</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Player 1</label>
+                  <SelectField
+                    name="player_1_id"
+                    v-model="formData.player_1_id"
+                    placeholder="Select member"
+                    :options="userOptions"
+                    :rules="''"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Player 2</label>
+                  <SelectField
+                    name="player_2_id"
+                    v-model="formData.player_2_id"
+                    placeholder="Select member"
+                    :options="userOptions"
+                    :rules="''"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Winner</label>
+                <SelectField
+                  name="winner_user_id"
+                  v-model="formData.winner_user_id"
+                  placeholder="Select winner"
+                  :options="singlesWinnerOptions"
+                  :rules="''"
+                />
+              </div>
+            </template>
+
+            <!-- Doubles / Mixed: two pairs of players -->
+            <template v-if="formData.match_type === 'doubles' || formData.match_type === 'mixed'">
+              <p v-if="formData.team_one_label || formData.team_two_label" class="text-xs text-white/40">Current: {{ formData.team_one_label || '—' }} vs {{ formData.team_two_label || '—' }}</p>
+              <div class="space-y-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Team / Pair 1</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                      <label class="text-xs text-white/40">Player 1</label>
+                      <SelectField
+                        name="team_one_player_1_id"
+                        v-model="formData.team_one_player_1_id"
+                        placeholder="Select member"
+                        :options="userOptions"
+                        :rules="''"
+                      />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                      <label class="text-xs text-white/40">Player 2</label>
+                      <SelectField
+                        name="team_one_player_2_id"
+                        v-model="formData.team_one_player_2_id"
+                        placeholder="Select member"
+                        :options="userOptions"
+                        :rules="''"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Team / Pair 2</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                      <label class="text-xs text-white/40">Player 1</label>
+                      <SelectField
+                        name="team_two_player_1_id"
+                        v-model="formData.team_two_player_1_id"
+                        placeholder="Select member"
+                        :options="userOptions"
+                        :rules="''"
+                      />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                      <label class="text-xs text-white/40">Player 2</label>
+                      <SelectField
+                        name="team_two_player_2_id"
+                        v-model="formData.team_two_player_2_id"
+                        placeholder="Select member"
+                        :options="userOptions"
+                        :rules="''"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Winner</label>
+                <SelectField
+                  name="winner_side"
+                  v-model="formData.winner_side"
+                  placeholder="Select winning team"
+                  :options="doublesWinnerOptions"
+                  :rules="''"
+                />
+              </div>
+            </template>
+
+            <!-- No match type: optional manual labels (fallback) -->
+            <template v-if="!formData.match_type || (formData.match_type && !['singles', 'doubles', 'mixed'].includes(formData.match_type))">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Team / Pair 1</label>
+                  <TextField
+                    name="team_one_label"
+                    v-model="formData.team_one_label"
+                    placeholder="e.g. Smith / Jones"
+                    :rules="'max:255'"
+                    optionalMessage="Team one"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Team / Pair 2</label>
+                  <TextField
+                    name="team_two_label"
+                    v-model="formData.team_two_label"
+                    placeholder="e.g. Doe / Brown"
+                    :rules="'max:255'"
+                    optionalMessage="Team two"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Winner</label>
+                <TextField
+                  name="winner_name"
+                  v-model="formData.winner_name"
+                  placeholder="Winner name or team"
+                  :rules="'max:255'"
+                  optionalMessage="Winner"
+                />
+              </div>
+            </template>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Final Score</label>
+                <TextField
+                  name="final_score"
+                  v-model="formData.final_score"
+                  :placeholder="formData.match_type === 'doubles' || formData.match_type === 'mixed' ? 'e.g. 6-4, 6-3' : 'e.g. 6-4, 6-3 or 8-6'"
+                  :rules="'max:255'"
+                  optionalMessage="Final score"
+                />
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold uppercase tracking-wider text-white/50">Match Notes</label>
+              <TextField
+                name="match_notes"
+                v-model="formData.match_notes"
+                placeholder="e.g. Tiebreak 7-5, retirement, etc."
+                :rules="'max:1000'"
+                optionalMessage="Match notes"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- ── Host & Management Card ── -->
         <div class="rounded-2xl border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm overflow-hidden">
           <div class="h-1 w-full bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
@@ -312,7 +492,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { usePageTitleStore } from '~/stores/pageTitle';
 import { Form } from 'vee-validate';
 import { useRoute } from 'vue-router';
@@ -329,6 +509,63 @@ const nuxtApp   = useNuxtApp();
 const route     = useRoute();
 const pageTitle = usePageTitleStore();
 const id        = route.params.id;
+
+// ── User list for player selectors ─────────────────────────────────────
+const userList = ref([]);
+
+const fetchUsers = async () => {
+  try {
+    const res = await nuxtApp.$axios.get('/cms/users', { params: { page: 1, per_page: 300 } });
+    const rec = res.data?.records;
+    const data = rec?.data ?? (Array.isArray(rec) ? rec : []);
+    userList.value = data || [];
+  } catch (e) {
+    console.error('Fetch users error:', e);
+    userList.value = [];
+  }
+};
+
+const userDisplayName = (user) => user?.user_detail?.full_name || user?.email || '—';
+
+const userOptions = computed(() => {
+  const list = userList.value || [];
+  return [
+    { value: '', label: '— Select —' },
+    ...list.map((u) => ({ value: u.id, label: userDisplayName(u) })),
+  ];
+});
+
+const singlesWinnerOptions = computed(() => {
+  const p1 = formData.player_1_id;
+  const p2 = formData.player_2_id;
+  const list = userList.value || [];
+  const opts = [{ value: '', label: '— Select winner —' }];
+  if (p1) {
+    const u = list.find((x) => x.id === p1);
+    opts.push({ value: p1, label: userDisplayName(u) || 'Player 1' });
+  }
+  if (p2) {
+    const u = list.find((x) => x.id === p2);
+    opts.push({ value: p2, label: userDisplayName(u) || 'Player 2' });
+  }
+  return opts;
+});
+
+const doublesWinnerOptions = computed(() => {
+  const t1p1 = formData.team_one_player_1_id;
+  const t1p2 = formData.team_one_player_2_id;
+  const t2p1 = formData.team_two_player_1_id;
+  const t2p2 = formData.team_two_player_2_id;
+  const list = userList.value || [];
+  const name = (id) => id ? userDisplayName(list.find((x) => x.id === id)) : '';
+  const team1Label = [t1p1, t1p2].filter(Boolean).map(name).filter(Boolean).join(' / ') || 'Team 1';
+  const team2Label = [t2p1, t2p2].filter(Boolean).map(name).filter(Boolean).join(' / ') || 'Team 2';
+  return [
+    { value: '', label: '— Select winning team —' },
+    ...(t1p1 || t1p2 ? [{ value: 'team_one', label: team1Label }] : []),
+    ...(t2p1 || t2p2 ? [{ value: 'team_two', label: team2Label }] : []),
+  ];
+});
 
 const eventTypeOptions = [
   { value: '',           label: '— Select —'  },
@@ -373,6 +610,19 @@ const formData = reactive({
   scoring_format:  '',
   assigned_coach:  '',
   event_status:    '',
+  final_score:     '',
+  winner_name:     '',
+  match_notes:     '',
+  team_one_label:  '',
+  team_two_label:  '',
+  player_1_id:     '',
+  player_2_id:     '',
+  winner_user_id:  '',
+  team_one_player_1_id: '',
+  team_one_player_2_id: '',
+  team_two_player_1_id: '',
+  team_two_player_2_id: '',
+  winner_side:     '',
 });
 
 const formDataFiles = reactive({ event_gallery: [] });
@@ -389,6 +639,7 @@ onMounted(() => {
   pageTitle.setBreadcrumbs(['Club Events', 'Events List', 'Edit Event']);
   pageTitle.setPageFrom('Events List');
   pageTitle.setPageFromRoute('/events');
+  fetchUsers();
   fetchRecord();
 });
 
@@ -418,6 +669,19 @@ const populateData = (data) => {
   formData.scoring_format  = data.scoring_format  || '';
   formData.assigned_coach  = data.assigned_coach  || '';
   formData.event_status    = data.event_status   || '';
+  formData.final_score     = data.final_score    || '';
+  formData.winner_name     = data.winner_name    || '';
+  formData.match_notes     = data.match_notes    || '';
+  formData.team_one_label  = data.team_one_label || '';
+  formData.team_two_label  = data.team_two_label || '';
+  formData.player_1_id     = '';
+  formData.player_2_id     = '';
+  formData.winner_user_id  = '';
+  formData.team_one_player_1_id = '';
+  formData.team_one_player_2_id = '';
+  formData.team_two_player_1_id = '';
+  formData.team_two_player_2_id = '';
+  formData.winner_side     = '';
 
   const gallery = data.gallery
     || data.images?.filter((img) => img.category === 'event_gallery')
@@ -426,7 +690,30 @@ const populateData = (data) => {
   eventGallery.value = Array.isArray(gallery) ? gallery : [];
 };
 
+function computedMatchResultLabels() {
+  const list = userList.value || [];
+  const name = (id) => (id ? (list.find((x) => x.id === id)?.user_detail?.full_name || list.find((x) => x.id === id)?.email) : null) || '';
+  let teamOne = '';
+  let teamTwo = '';
+  let winner = '';
+  if (formData.match_type === 'singles') {
+    teamOne = name(formData.player_1_id);
+    teamTwo = name(formData.player_2_id);
+    winner = name(formData.winner_user_id);
+  } else if (formData.match_type === 'doubles' || formData.match_type === 'mixed') {
+    teamOne = [formData.team_one_player_1_id, formData.team_one_player_2_id].filter(Boolean).map(name).filter(Boolean).join(' / ');
+    teamTwo = [formData.team_two_player_1_id, formData.team_two_player_2_id].filter(Boolean).map(name).filter(Boolean).join(' / ');
+    winner = formData.winner_side === 'team_one' ? teamOne : formData.winner_side === 'team_two' ? teamTwo : '';
+  } else {
+    teamOne = formData.team_one_label || '';
+    teamTwo = formData.team_two_label || '';
+    winner = formData.winner_name || '';
+  }
+  return { teamOne, teamTwo, winner };
+}
+
 const submit = async () => {
+  const { teamOne, teamTwo, winner } = computedMatchResultLabels();
   const formElement = document.getElementById('form');
   const form_data   = new FormData(formElement);
   form_data.append('_method',     'PATCH');
@@ -439,6 +726,11 @@ const submit = async () => {
   form_data.append('scoring_format',   formData.scoring_format   || '');
   form_data.append('assigned_coach',   formData.assigned_coach   || '');
   form_data.append('event_status',     formData.event_status     || '');
+  form_data.append('final_score',      formData.final_score     || '');
+  form_data.append('winner_name',      winner);
+  form_data.append('match_notes',      formData.match_notes     || '');
+  form_data.append('team_one_label',   teamOne);
+  form_data.append('team_two_label',   teamTwo);
 
   (formDataFiles.event_gallery || []).forEach((file) => {
     if (file instanceof File) form_data.append('event_gallery[]', file);
