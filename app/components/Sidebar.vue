@@ -57,12 +57,7 @@
           role="dialog"
           aria-label="Navigation menu"
         >
-          <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A227] to-[#D4AF37]" />
-          <div class="flex items-center justify-between h-16 px-4 border-b border-white/10 flex-shrink-0">
-            <router-link to="/dashboard" class="flex items-center gap-2" @click="closeMobile">
-              <img v-if="logoSrc" :src="logoSrc" alt="Logo" class="h-9 w-auto object-contain max-w-[140px]" />
-              <span v-else class="text-lg font-semibold text-white">Members Portal</span>
-            </router-link>
+          <div class="flex items-center justify-end flex-shrink-0 pt-3 pr-3">
             <button
               type="button"
               class="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
@@ -74,7 +69,7 @@
               </svg>
             </button>
           </div>
-          <nav class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-2">
+          <nav class="flex-1 overflow-y-auto px-3 py-2 flex flex-col gap-2">
             <router-link
               v-for="item in sidebarNavItems"
               :key="item.name"
@@ -117,50 +112,21 @@ const sidebarStore = useSidebarStore();
 const authStore = useAuthStore();
 const { mobileSidebarOpen: mobileOpen } = storeToRefs(sidebarStore);
 
-// Same tile items as dashboard, excluding My Profile (sidebar shows only these)
-const sidebarNavItems = computed(() => {
-  const items = [
-    {
-      name: 'Dashboard',
-      emoji: '🏠',
-      description: 'Back to home',
-      link: '/dashboard',
-    },
-    {
-      name: 'Announcements',
-      emoji: '📢',
-      description: 'Stay up-to-date on club news and notices.',
-      link: '/announcements',
-    },
-    {
-      name: 'Schedules',
-      emoji: '📅',
-      description: 'View upcoming matches and reservations.',
-      link: '/schedule',
-    },
-    {
-      name: 'Club Events',
-      emoji: '🏆',
-      description: 'Browse tournaments, mixers, and social events.',
-      link: '/events',
-    },
-    {
-      name: 'Members',
-      emoji: '👥',
-      description: 'Find and connect with fellow club members.',
-      link: '/admin-settings/cms-editors',
-    },
-    {
-      name: 'Roles',
-      emoji: '🔑',
-      description: 'Manage roles and permissions.',
-      link: '/admin-settings/roles',
-    },
-  ];
-  return items;
-});
+const { hasModuleAccess } = useModuleCrud();
 
-const logoSrc = '';
+// Same tile items as dashboard (excluding My Profile), filtered by module access
+const allSidebarItems = [
+  { name: 'Dashboard', emoji: '🏠', description: 'Back to home', link: '/dashboard', unique: null },
+  { name: 'Announcements', emoji: '📢', description: 'Stay up-to-date on club news and notices.', link: '/announcements', unique: 'announcements' },
+  { name: 'Schedules', emoji: '📅', description: 'View upcoming matches and reservations.', link: '/schedule', unique: null },
+  { name: 'Club Events', emoji: '🏆', description: 'Browse tournaments, mixers, and social events.', link: '/events', unique: 'events' },
+  { name: 'Members', emoji: '👥', description: 'Find and connect with fellow club members.', link: '/admin-settings/cms-editors', unique: 'cms-editors' },
+  { name: 'Activity Logs', emoji: '🔔', description: 'View audit logs of key member activities.', link: '/activity-logs', unique: 'activity-logs' },
+  { name: 'Roles', emoji: '🔑', description: 'Manage roles and permissions.', link: '/admin-settings/roles', unique: 'roles' },
+];
+const sidebarNavItems = computed(() =>
+  allSidebarItems.filter((item) => !item.unique || hasModuleAccess(item.unique))
+);
 
 const isActive = (item) => {
   const path = route.path.replace(/^\//, '');

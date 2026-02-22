@@ -183,6 +183,21 @@ export const usePermissionStore = defineStore('permissions', {
                     unique: 'admin-settings-website-settings',
                     route_name: ['admin-settings-website-settings']
                 },
+                {
+                    name: 'Announcements',
+                    unique: 'announcements',
+                    route_name: ['announcements', 'announcements-create', 'announcements-id', 'announcements-view-id']
+                },
+                {
+                    name: 'Activity Logs',
+                    unique: 'activity-logs',
+                    route_name: ['activity-logs']
+                },
+                {
+                    name: 'Club Events',
+                    unique: 'events',
+                    route_name: ['events', 'events-create', 'events-id', 'events-view-id']
+                },
             ],
         };
     },

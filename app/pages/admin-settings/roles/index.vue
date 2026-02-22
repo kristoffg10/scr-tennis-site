@@ -40,6 +40,7 @@
             <span class="font-medium text-white/70">{{ roles.total ?? 0 }}</span>
           </p>
           <router-link
+            v-if="rolesCrud.create"
             to="/admin-settings/roles/create"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
           >
@@ -72,6 +73,7 @@
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
                 <router-link
+                  v-if="rolesCrud.update"
                   :to="`/admin-settings/roles/${role.id}`"
                   class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 transition-all"
                 >
@@ -80,6 +82,7 @@
                   </svg>
                 </router-link>
                 <button
+                  v-if="rolesCrud.delete"
                   type="button"
                   class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isDeleteDisabled(role)"
@@ -139,6 +142,7 @@
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <router-link
+                      v-if="rolesCrud.update"
                       :to="`/admin-settings/roles/${role.id}`"
                       class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 hover:border-[#C9A227]/50 transition-all"
                       :title="`Edit ${role.name}`"
@@ -148,6 +152,7 @@
                       </svg>
                     </router-link>
                     <button
+                      v-if="rolesCrud.delete"
                       type="button"
                       class="w-8 h-8 rounded-full flex items-center justify-center transition-all"
                       :class="isDeleteDisabled(role)
@@ -192,6 +197,7 @@
   </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import { usePageTitleStore } from '~/stores/pageTitle';
 import { usePaginationStore } from '~/stores/pagination';
 
@@ -203,6 +209,8 @@ const Pagination = defineAsyncComponent(() => import('@/components/Pagination.vu
 const pageTitle = usePageTitleStore();
 const pagination = usePaginationStore();
 const nuxtApp = useNuxtApp();
+const { getModuleCrud } = useModuleCrud();
+const rolesCrud = computed(() => getModuleCrud('roles'));
 const roles = ref(null);
 const keyword = ref('');
 const showDeletePopup = ref(false);
@@ -269,7 +277,11 @@ const openDeletePopup = (url) => {
   deletePath.value = url;
 };
 
-onMounted(() => {
+onMounted(async () => {
+  if (!rolesCrud.value.read) {
+    await navigateTo('/dashboard');
+    return;
+  }
   pagination.reset();
   fetchRecords();
   pageTitle.setTitle('Roles');

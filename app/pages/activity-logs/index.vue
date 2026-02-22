@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-full relative bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] overflow-y-auto overflow-x-hidden pt-[220px] pb-16"
+    class="min-h-screen w-full relative bg-gradient-to-br from-[#0D2818] via-[#1a3c29] to-[#2d5a3d] overflow-y-auto overflow-x-hidden pt-[150px] pb-16"
   >
     <!-- Texture overlay -->
     <div
@@ -172,6 +172,8 @@ const Pagination = defineAsyncComponent(() => import('@/components/Pagination.vu
 
 const nuxtApp = useNuxtApp();
 const pagination = usePaginationStore();
+const { getModuleCrud } = useModuleCrud();
+const activityLogsCrud = computed(() => getModuleCrud('activity-logs'));
 const records = ref(null);
 
 const recordsData = computed(() => {
@@ -207,7 +209,11 @@ const fetchRecords = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  if (!activityLogsCrud.value.read) {
+    await navigateTo('/dashboard');
+    return;
+  }
   pagination.setPage(1);
   fetchRecords();
 });

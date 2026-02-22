@@ -49,6 +49,7 @@
               <span class="font-medium text-white/70">{{ users.total }}</span>
             </p>
             <router-link
+              v-if="membersCrud.create"
               to="/admin-settings/cms-editors/create"
               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
             >
@@ -84,6 +85,7 @@
                 <!-- Actions -->
                 <div class="flex items-center gap-1.5 shrink-0">
                   <router-link
+                    v-if="membersCrud.read"
                     :to="`/admin-settings/cms-editors/${user.id}/view`"
                     class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white transition-all"
                     title="View"
@@ -94,7 +96,7 @@
                     </svg>
                   </router-link>
                   <router-link
-                    v-if="canEditUser(user.id)"
+                    v-if="canEditUser(user.id) && membersCrud.update"
                     :to="`/admin-settings/cms-editors/${user.id}/update`"
                     class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 transition-all"
                     :title="`Edit ${user?.user_detail?.full_name ?? user?.email ?? 'user'}`"
@@ -104,6 +106,7 @@
                     </svg>
                   </router-link>
                   <button
+                    v-if="membersCrud.delete"
                     type="button"
                     :disabled="isDeleteDisabled(user.id)"
                     :class="[
@@ -208,6 +211,7 @@
                   <td class="px-6 py-4">
                     <div class="flex items-center justify-end gap-2">
                       <router-link
+                        v-if="membersCrud.read"
                         :to="`/admin-settings/cms-editors/${user.id}/view`"
                         class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white hover:border-white/25 transition-all"
                         :title="`View ${user?.user_detail?.full_name ?? user?.email ?? 'user'}`"
@@ -218,7 +222,7 @@
                         </svg>
                       </router-link>
                       <router-link
-                        v-if="canEditUser(user.id)"
+                        v-if="canEditUser(user.id) && membersCrud.update"
                         :to="`/admin-settings/cms-editors/${user.id}/update`"
                         class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 hover:border-[#C9A227]/50 transition-all"
                         :title="`Edit ${user?.user_detail?.full_name ?? user?.email ?? 'user'}`"
@@ -228,6 +232,7 @@
                         </svg>
                       </router-link>
                       <button
+                        v-if="membersCrud.delete"
                         type="button"
                         :disabled="isDeleteDisabled(user.id)"
                         :class="[
@@ -276,12 +281,15 @@
   </template>
   
   <script setup>
-  import { ref, watch, onMounted } from 'vue';
+  import { ref, computed, watch, onMounted } from 'vue';
   import { usePageTitleStore } from '~/stores/pageTitle';
   import { usePaginationStore } from '~/stores/pagination';
   import { useAuthStore } from '~/stores/auth';
 
   definePageMeta({ middleware: 'authenticator' });
+
+  const { getModuleCrud } = useModuleCrud();
+  const membersCrud = computed(() => getModuleCrud('cms-editors'));
   
   // ── Sub-components ───────────────────────────────────────
   // Inline sort icon component
@@ -358,7 +366,11 @@
     deletePath.value = url;
   };
   
-  onMounted(() => {
+  onMounted(async () => {
+    if (!membersCrud.value.read) {
+      await navigateTo('/dashboard');
+      return;
+    }
     pagination.reset();
     pageTitle.setTitle('Users');
     pageTitle.setBreadcrumbs(['Admin Settings', 'Users']);

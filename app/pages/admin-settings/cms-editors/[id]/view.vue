@@ -130,7 +130,7 @@
             Back to Members
           </router-link>
           <router-link
-            v-if="canEditUser(userData.id)"
+            v-if="canEditUser(userData.id) && membersCrud.update"
             :to="`/admin-settings/cms-editors/${route.params.id}/update`"
             class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
           >
@@ -158,6 +158,8 @@ const pageTitle = usePageTitleStore();
 const authStore = useAuthStore();
 const nuxtApp = useNuxtApp();
 const id = route.params.id;
+const { getModuleCrud } = useModuleCrud();
+const membersCrud = computed(() => getModuleCrud('cms-editors'));
 
 const userData = ref(null);
 const loading = ref(true);

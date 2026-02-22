@@ -40,6 +40,7 @@
             <span class="font-medium text-white/70">{{ events.total ?? 0 }}</span>
           </p>
           <router-link
+            v-if="eventsCrud.create"
             to="/events/create"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
           >
@@ -72,6 +73,7 @@
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
                 <router-link
+                  v-if="eventsCrud.read"
                   :to="`/events/view/${event.id}`"
                   class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white transition-all"
                   title="View"
@@ -82,6 +84,7 @@
                   </svg>
                 </router-link>
                 <router-link
+                  v-if="eventsCrud.update"
                   :to="`/events/${event.id}`"
                   class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 transition-all"
                 >
@@ -90,6 +93,7 @@
                   </svg>
                 </router-link>
                 <button
+                  v-if="eventsCrud.delete"
                   type="button"
                   class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 transition-all"
                   @click="openDeletePopup(`/cms/events/${event.id}`)"
@@ -140,6 +144,7 @@
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <router-link
+                      v-if="eventsCrud.read"
                       :to="`/events/view/${event.id}`"
                       class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white hover:border-white/25 transition-all"
                       :title="`View ${event.title}`"
@@ -150,6 +155,7 @@
                       </svg>
                     </router-link>
                     <router-link
+                      v-if="eventsCrud.update"
                       :to="`/events/${event.id}`"
                       class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 hover:border-[#C9A227]/50 transition-all"
                       :title="`Edit ${event.title}`"
@@ -159,6 +165,7 @@
                       </svg>
                     </router-link>
                     <button
+                      v-if="eventsCrud.delete"
                       type="button"
                       class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 hover:border-red-400/40 transition-all"
                       :title="`Delete ${event.title}`"
@@ -211,6 +218,8 @@ const Pagination = defineAsyncComponent(() => import('@/components/Pagination.vu
 const pageTitle = usePageTitleStore();
 const pagination = usePaginationStore();
 const nuxtApp = useNuxtApp();
+const { getModuleCrud } = useModuleCrud();
+const eventsCrud = computed(() => getModuleCrud('events'));
 
 const events = ref(null);
 const keyword = ref('');
@@ -251,6 +260,10 @@ const openDeletePopup = (url) => {
 };
 
 onMounted(async () => {
+  if (!eventsCrud.value.read) {
+    await navigateTo('/dashboard');
+    return;
+  }
   pagination.reset();
   await fetchRecords();
   pageTitle.setTitle('Club Events');

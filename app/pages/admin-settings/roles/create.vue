@@ -80,9 +80,10 @@
                       <div class="flex items-center gap-2">
                         <span class="text-xl leading-none">{{ mod.icon }}</span>
                         <span class="font-medium text-white/90">{{ mod.name }}</span>
+                        <span v-if="mod.readOnly" class="text-xs text-white/40">(view only)</span>
                       </div>
                     </td>
-                    <td class="px-4 py-3 text-center">
+                    <td v-if="!mod.readOnly" class="px-4 py-3 text-center">
                       <label class="inline-flex items-center justify-center w-8 h-8 rounded-lg border-2 cursor-pointer transition-colors"
                         :class="mod.create ? 'border-[#C9A227] bg-[#C9A227]/20 text-[#D4AF37]' : 'border-white/30 hover:border-white/50 text-white/20'">
                         <input type="checkbox" v-model="mod.create" class="sr-only" />
@@ -91,6 +92,7 @@
                         </svg>
                       </label>
                     </td>
+                    <td v-else class="px-4 py-3 text-center text-white/30 text-xs">—</td>
                     <td class="px-4 py-3 text-center">
                       <label class="inline-flex items-center justify-center w-8 h-8 rounded-lg border-2 cursor-pointer transition-colors"
                         :class="mod.read ? 'border-[#C9A227] bg-[#C9A227]/20 text-[#D4AF37]' : 'border-white/30 hover:border-white/50 text-white/20'">
@@ -100,7 +102,7 @@
                         </svg>
                       </label>
                     </td>
-                    <td class="px-4 py-3 text-center">
+                    <td v-if="!mod.readOnly" class="px-4 py-3 text-center">
                       <label class="inline-flex items-center justify-center w-8 h-8 rounded-lg border-2 cursor-pointer transition-colors"
                         :class="mod.update ? 'border-[#C9A227] bg-[#C9A227]/20 text-[#D4AF37]' : 'border-white/30 hover:border-white/50 text-white/20'">
                         <input type="checkbox" v-model="mod.update" class="sr-only" />
@@ -109,7 +111,8 @@
                         </svg>
                       </label>
                     </td>
-                    <td class="px-4 py-3 text-center">
+                    <td v-else class="px-4 py-3 text-center text-white/30 text-xs">—</td>
+                    <td v-if="!mod.readOnly" class="px-4 py-3 text-center">
                       <label class="inline-flex items-center justify-center w-8 h-8 rounded-lg border-2 cursor-pointer transition-colors"
                         :class="mod.delete ? 'border-[#C9A227] bg-[#C9A227]/20 text-[#D4AF37]' : 'border-white/30 hover:border-white/50 text-white/20'">
                         <input type="checkbox" v-model="mod.delete" class="sr-only" />
@@ -118,11 +121,12 @@
                         </svg>
                       </label>
                     </td>
+                    <td v-else class="px-4 py-3 text-center text-white/30 text-xs">—</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p class="text-xs text-white/40">Only these modules are configurable: Club Events, Members, Announcements, Activity Logs, Roles.</p>
+            <p class="text-xs text-white/40">Only these modules are configurable: Club Events, Members, Announcements, Activity Logs (view only), Roles.</p>
             <ErrorMessage name="permission" class="text-red-400 font-medium text-sm" />
           </div>
         </div>
@@ -157,7 +161,7 @@ const MODULES = [
   { unique: 'events', name: 'Club Events', icon: '🏆' },
   { unique: 'cms-editors', name: 'Members', icon: '👥' },
   { unique: 'announcements', name: 'Announcements', icon: '📢' },
-  { unique: 'activity-logs', name: 'Activity Logs', icon: '🔔' },
+  { unique: 'activity-logs', name: 'Activity Logs', icon: '🔔', readOnly: true },
   { unique: 'roles', name: 'Roles', icon: '🔑' },
 ];
 
@@ -192,14 +196,17 @@ const submit = async () => {
 
   const formElement = document.getElementById('form');
   const form_data = new FormData(formElement);
-  const permissions = modulePermissions.value.map((m) => ({
-    unique: m.unique,
-    name: m.name,
-    create: !!m.create,
-    read: !!m.read,
-    update: !!m.update,
-    delete: !!m.delete,
-  }));
+  const permissions = modulePermissions.value.map((m) => {
+    const readOnly = MODULES.find((mod) => mod.unique === m.unique)?.readOnly;
+    return {
+      unique: m.unique,
+      name: m.name,
+      create: readOnly ? false : !!m.create,
+      read: !!m.read,
+      update: readOnly ? false : !!m.update,
+      delete: readOnly ? false : !!m.delete,
+    };
+  });
   form_data.append('permissions', JSON.stringify(permissions));
 
   try {

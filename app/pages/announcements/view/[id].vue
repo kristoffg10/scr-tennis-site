@@ -82,6 +82,16 @@
             </svg>
             Back to Announcements
           </router-link>
+          <router-link
+            v-if="announcementsCrud.update"
+            :to="`/announcements/${id}`"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8477 1.87868C19.6761 0.707109 17.7766 0.707105 16.605 1.87868L2.44744 16.0363C2.02864 16.4551 1.74317 16.9885 1.62702 17.5692L1.03995 20.5046C0.760062 21.904 1.9939 23.1379 3.39334 22.858L6.32868 22.2709C6.90945 22.1548 7.44285 21.8693 7.86165 21.4505L22.0192 7.29289C23.1908 6.12132 23.1908 4.22183 22.0192 3.05025L20.8477 1.87868Z" fill="currentColor"/>
+            </svg>
+            Edit Announcement
+          </router-link>
         </div>
       </template>
     </div>
@@ -89,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { usePageTitleStore } from '~/stores/pageTitle';
 
@@ -99,6 +109,9 @@ const route = useRoute();
 const pageTitle = usePageTitleStore();
 const nuxtApp = useNuxtApp();
 const id = route.params.id;
+
+const { getModuleCrud } = useModuleCrud();
+const announcementsCrud = computed(() => getModuleCrud('announcements'));
 
 const announcementData = ref(null);
 

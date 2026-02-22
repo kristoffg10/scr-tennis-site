@@ -121,10 +121,14 @@
         </div>
       </section>
 
-      <!-- Upcoming Event (left) + Latest Announcement (right) -->
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in dashboard-section-2">
-        <!-- Left: Upcoming Event -->
+      <!-- Upcoming Event (left, if permission) + Latest Announcement (right, if permission) -->
+      <section
+        class="grid gap-6 animate-in dashboard-section-2"
+        :class="(announcementsCrud.read && eventsCrud.read) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'"
+      >
+        <!-- Left: Upcoming Event (only if user has events read) -->
         <div
+          v-if="eventsCrud.read"
           class="dashboard-card rounded-2xl overflow-hidden border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm"
         >
           <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
@@ -155,8 +159,9 @@
           </div>
         </div>
 
-        <!-- Right: Latest Announcement -->
+        <!-- Right: Latest Announcement (only if user has announcements read permission) -->
         <div
+          v-if="announcementsCrud.read"
           class="dashboard-card rounded-2xl overflow-hidden border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm"
         >
           <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
@@ -201,14 +206,15 @@
 
       <!-- Announcement detail modal (from Latest Announcement card) -->
       <AnnouncementPopup
+        v-if="announcementsCrud.read"
         :show="showAnnouncementModal"
         :announcement="latestAnnouncement || { title: '', content: '', date: null }"
         @dismiss="showAnnouncementModal = false"
         @close="showAnnouncementModal = false"
       />
 
-      <!-- Most Recent Event (score & team) -->
-      <section class="animate-in dashboard-section-3">
+      <!-- Most Recent Event (score & team, only if user has events read) -->
+      <section v-if="eventsCrud.read" class="animate-in dashboard-section-3">
         <div
           class="dashboard-card rounded-2xl overflow-hidden border border-[#C9A227]/20 bg-white/5 backdrop-blur-sm"
         >
@@ -307,71 +313,24 @@ const slideToIndex = (i) => {
   }
 };
 
-// ── Tile items ───────────────────────────────────────────
-const tileItems = computed(() => [
-  // {
-  //   name: 'Book a Court',
-  //   emoji: '🎾',
-  //   description: 'Reserve your preferred court and time slot.',
-  //   link: '/courts/book',
-  // },
-  {
-    name: 'Schedules',
-    emoji: '📅',
-    description: 'View upcoming matches and reservations.',
-    link: '/schedule',
-  },
-  {
-    name: 'Club Events',
-    emoji: '🏆',
-    description: 'Browse tournaments, mixers, and social events.',
-    link: '/events',
-  },
-  {
-    name: 'Members',
-    emoji: '👥',
-    description: 'Find and connect with fellow club members.',
-    link: '/admin-settings/cms-editors',
-  },
-  {
-    name: 'Announcements',
-    emoji: '📢',
-    description: 'Stay up-to-date on club news and notices.',
-    link: '/announcements',
-  },
-  {
-    name: 'Roles',
-    emoji: '🔑',
-    description: 'Manage roles and permissions.',
-    link: '/admin-settings/roles',
-  },
-  {
-    name: 'My Profile',
-    emoji: '👤',
-    description: 'Manage your membership details and settings.',
-    link: `/admin-settings/cms-editors/${auth.user?.id}/update`,
-  },
-]);
+// ── Permissions (role CRUD per module) ────────────────────
+const { hasModuleAccess, getModuleCrud } = useModuleCrud();
+const announcementsCrud = computed(() => getModuleCrud('announcements'));
+const eventsCrud = computed(() => getModuleCrud('events'));
 
-// ── Permissions ──────────────────────────────────────────
-const userUniques = computed(() => {
-  const user = auth.user;
-  if (!user?.role?.permissions) return [];
-  try {
-    const raw = user.role.permissions;
-    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return (parsed || []).map((p) => p?.unique).filter(Boolean);
-  } catch {
-    return [];
-  }
-});
-
-const isAuthorized = (unique) => {
-  if (auth.isSuperAdmin) return true;
-  const list = userUniques.value;
-  if (!list.length) return true;
-  return list.includes(unique);
-};
+// ── Tile items (filtered by module access) ───────────────
+const allTileItems = [
+  { name: 'Schedules', emoji: '📅', description: 'View upcoming matches and reservations.', link: '/schedule', unique: null },
+  { name: 'Club Events', emoji: '🏆', description: 'Browse tournaments, mixers, and social events.', link: '/events', unique: 'events' },
+  { name: 'Members', emoji: '👥', description: 'Find and connect with fellow club members.', link: '/admin-settings/cms-editors', unique: 'cms-editors' },
+  { name: 'Announcements', emoji: '📢', description: 'Stay up-to-date on club news and notices.', link: '/announcements', unique: 'announcements' },
+  { name: 'Activity Logs', emoji: '🔔', description: 'View audit logs of key member activities.', link: '/activity-logs', unique: 'activity-logs' },
+  { name: 'Roles', emoji: '🔑', description: 'Manage roles and permissions.', link: '/admin-settings/roles', unique: 'roles' },
+  { name: 'My Profile', emoji: '👤', description: 'Manage your membership details and settings.', link: `/admin-settings/cms-editors/${auth.user?.id}/update`, unique: null },
+];
+const tileItems = computed(() =>
+  allTileItems.filter((tile) => !tile.unique || hasModuleAccess(tile.unique))
+);
 
 // ── Upcoming event (left section) ────────────────────────────────────────
 const upcomingEvent = ref(null);
@@ -483,7 +442,7 @@ const fetchLatestAnnouncement = async () => {
 };
 
 onMounted(() => {
-  fetchLatestAnnouncement();
+  if (announcementsCrud.value.read) fetchLatestAnnouncement();
   fetchUpcomingEvent();
   fetchMostRecentEvent();
 });

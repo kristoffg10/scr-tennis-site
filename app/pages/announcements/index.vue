@@ -41,7 +41,7 @@
             />
           </div>
   
-          <!-- Count + Add button -->
+          <!-- Count + Add button (Add only if create permission) -->
           <div class="flex items-center gap-4 shrink-0">
             <p v-if="announcements" class="text-xs text-white/40 hidden sm:block">
               <span class="font-medium text-white/70">{{ announcements.from ?? 0 }}–{{ announcements.to ?? 0 }}</span>
@@ -49,6 +49,7 @@
               <span class="font-medium text-white/70">{{ announcements.total ?? 0 }}</span>
             </p>
             <router-link
+              v-if="announcementsCrud.create"
               to="/announcements/create"
               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
             >
@@ -83,9 +84,10 @@
                     <p class="text-xs text-white/40 mt-0.5">{{ $moment(announcement.date).format('MMM DD, YYYY') }}</p>
                   </div>
                 </div>
-                <!-- Actions -->
+                <!-- Actions (permission-gated) -->
                 <div class="flex items-center gap-1.5 shrink-0">
                   <router-link
+                    v-if="announcementsCrud.read"
                     :to="`/announcements/view/${announcement.id}`"
                     class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white transition-all"
                     title="View"
@@ -96,6 +98,7 @@
                     </svg>
                   </router-link>
                   <router-link
+                    v-if="announcementsCrud.update"
                     :to="`/announcements/${announcement.id}`"
                     class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 transition-all"
                   >
@@ -104,6 +107,7 @@
                     </svg>
                   </router-link>
                   <button
+                    v-if="announcementsCrud.delete"
                     type="button"
                     class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 transition-all"
                     @click="openDeletePopup(`/cms/announcements/${announcement.id}`)"
@@ -191,10 +195,11 @@
                     <span class="text-white/35">{{ $moment(announcement.updated_at).format('hh:mm A') }}</span>
                   </td>
   
-                  <!-- Actions -->
+                  <!-- Actions (permission-gated) -->
                   <td class="px-6 py-4">
                     <div class="flex items-center justify-end gap-2">
                       <router-link
+                        v-if="announcementsCrud.read"
                         :to="`/announcements/view/${announcement.id}`"
                         class="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:bg-white/15 hover:text-white hover:border-white/25 transition-all"
                         :title="`View ${announcement.title}`"
@@ -205,6 +210,7 @@
                         </svg>
                       </router-link>
                       <router-link
+                        v-if="announcementsCrud.update"
                         :to="`/announcements/${announcement.id}`"
                         class="w-8 h-8 rounded-full bg-[#C9A227]/10 border border-[#C9A227]/25 flex items-center justify-center text-[#D4AF37] hover:bg-[#C9A227]/30 hover:border-[#C9A227]/50 transition-all"
                         :title="`Edit ${announcement.title}`"
@@ -214,6 +220,7 @@
                         </svg>
                       </router-link>
                       <button
+                        v-if="announcementsCrud.delete"
                         type="button"
                         class="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/25 hover:border-red-400/40 transition-all"
                         :title="`Delete ${announcement.title}`"
@@ -269,6 +276,9 @@
   const pagination = usePaginationStore();
   const nuxtApp = useNuxtApp();
   
+  const { getModuleCrud } = useModuleCrud();
+  const announcementsCrud = computed(() => getModuleCrud('announcements'));
+  
   const announcements = ref(null);
   const keyword = ref('');
   const showDeletePopup = ref(false);
@@ -308,6 +318,10 @@
   };
   
   onMounted(async () => {
+    if (!announcementsCrud.value.read) {
+      await navigateTo('/dashboard');
+      return;
+    }
     pagination.reset();
     await fetchRecords();
     pageTitle.setTitle('Announcements');

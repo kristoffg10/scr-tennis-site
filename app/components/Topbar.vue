@@ -60,7 +60,8 @@
                   <span v-if="weatherLocation" class="text-xs text-white/50 truncate max-w-[80px]" :title="weatherLocation">{{ weatherLocation }}</span>
               </div>
           </div>
-          <!-- Activity logs bell: on mobile go to page, on desktop open popup -->
+          <!-- Activity logs bell: on mobile go to page, on desktop open popup (only if user has activity-logs read) -->
+          <template v-if="activityLogsCrud.read">
           <NuxtLink
               to="/activity-logs"
               class="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#D4AF37] transition-colors"
@@ -163,6 +164,7 @@
                   </div>
               </Transition>
           </div>
+          </template>
           <div @click="toggled()" class="flex justify-center gap-x-[8px] items-center py-[6px] px-[14px] relative cursor-pointer rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 transition-colors" :class="{'bg-[#C9A227]/20 border-[#C9A227]/40' : isToggled}">
               <!-- Profile image or initials -->
               <div v-if="displayUser" class="w-8 h-8 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 flex items-center justify-center text-[#D4AF37] text-sm font-semibold shrink-0 overflow-hidden">
@@ -282,6 +284,8 @@ import { useSidebarStore } from '~/stores/sidebar';
 const auth = useAuth();
 const sidebarStore = useSidebarStore();
 const nuxtApp = useNuxtApp();
+const { getModuleCrud } = useModuleCrud();
+const activityLogsCrud = computed(() => getModuleCrud('activity-logs'));
 
 const openSidebar = () => {
   sidebarStore.setMobileSidebarOpen(true);

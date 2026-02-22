@@ -278,7 +278,8 @@
             </svg>
             Back to Schedule
           </router-link>
-          <!-- <router-link
+          <router-link
+            v-if="eventsCrud.update"
             :to="`/events/${route.params.id}`"
             class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#D4AF37] text-[#0D2818] text-sm font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#C9A227]/20"
           >
@@ -286,7 +287,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
             </svg>
             Edit Event
-          </router-link> -->
+          </router-link>
         </div>
       </template>
     </div>
@@ -304,6 +305,8 @@ const route = useRoute();
 const pageTitle = usePageTitleStore();
 const nuxtApp = useNuxtApp();
 const id = route.params.id;
+const { getModuleCrud } = useModuleCrud();
+const eventsCrud = computed(() => getModuleCrud('events'));
 
 const eventData = ref(null);
 const eventGallery = ref([]);
