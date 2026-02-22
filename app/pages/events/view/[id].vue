@@ -185,7 +185,7 @@
               </svg>
             </div>
             <div>
-              <h2 class="text-base font-semibold text-white">Gallery</h2>
+              <h2 class="text-base font-semibold text-white">Image Gallery</h2>
               <p class="text-xs text-white/40">{{ eventGallery.length }} image(s)</p>
             </div>
           </div>

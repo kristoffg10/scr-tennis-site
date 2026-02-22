@@ -26,7 +26,7 @@
             :placeholder="placeholder"
             v-bind="fieldProps"
             :value="modelValue"
-            class="w-full p-[16px] border placeholder:opacity-20 rounded-[10px] mb-[8px] outline-none focus:border-ui-color text-[#2a2a2a]"
+            class="w-full p-[16px] border placeholder:text-gray-500 rounded-[10px] mb-[8px] outline-none focus:border-ui-color text-[#2a2a2a]"
             :class="{
                 'border-danger': hasError,
                 'border-[#2A2A2A]/20': !hasError,
